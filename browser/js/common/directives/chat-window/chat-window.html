@@ -1,0 +1,6 @@
+<div>
+<!--     <button ng-click="login()" ng-hide="authData">Log In</button> -->
+    <input ng-model="newMessage.text" ng-keyup="handleKeyup($event)">
+    <p> {{ data }} </p>
+    <div ng-repeat="message in data.messages"> <b>{{ message.author }}:</b> {{ message.text }} </div>
+</div>
