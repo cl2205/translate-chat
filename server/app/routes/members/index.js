@@ -1,7 +1,13 @@
 'use strict';
 var router = require('express').Router();
+var mongoose = require('mongoose');
+var User = mongoose.model('User');
 module.exports = router;
 var _ = require('lodash');
+var requestPromise = require('request-promise');
+var app = require('../../index');   // doing a fs read File
+var apiKey = app.getValue('env').TRANSLATE.apiKey;
+
 
 var ensureAuthenticated = function (req, res, next) {
     if (req.isAuthenticated()) {
@@ -10,6 +16,15 @@ var ensureAuthenticated = function (req, res, next) {
         res.status(401).end();
     }
 };
+
+router.post('/login', function (req, res, next) {
+    User.findOne({ email: req.body.email }).exec().then(function (user) {
+        if (!user) throw new Error('not found');
+        else if (!user.authenticate(req.body.password)) console.log("Invalid credentials");
+        else req.session.userId = user._id;
+        return req.session;
+    });
+});
 
 router.get('/secret-stash', ensureAuthenticated, function (req, res) {
 
@@ -30,3 +45,30 @@ router.get('/secret-stash', ensureAuthenticated, function (req, res) {
     res.send(_.shuffle(theStash));
 
 });
+
+router.get('/', function (req, res, next) {
+
+    var url = 'https://www.googleapis.com/language/translate/v2/languages';
+
+    var qs = {
+        key: apiKey,
+        target: req.query.language
+    };
+
+    requestPromise({ url: url, qs: qs })
+
+        .then(function(body) {
+            body = JSON.parse(body);
+            var languagesArr = body.data.languages;
+            return languagesArr;
+        })
+
+        .then(function(languageList) {
+            res.send(languageList);
+        })
+        .catch(console.error);
+});
+
+
+
+router.use('/translate', require('../translate'));

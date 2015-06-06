@@ -1,6 +1,29 @@
 <div>
-<!--     <button ng-click="login()" ng-hide="authData">Log In</button> -->
-    <input ng-model="newMessage.text" ng-keyup="handleKeyup($event)">
-    <p> {{ data }} </p>
-    <div ng-repeat="message in data.messages"> <b>{{ message.author }}:</b> {{ message.text }} </div>
+<!-- 	<div>
+		<h4>In what language would you like your messages sent?</h4>
+		<select id="languageList" class="form-control" ng-model="list">
+			<option ng-repeat="language in list" ng-click="setLanguage(language.language)">{{ language.name }}</option>
+		</select>
+	</div> -->
+
+	    <!-- Single button -->
+    <div id="languageList" class="btn-group" dropdown is-open="status.isopen">
+      <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle ng-disabled="disabled">
+        Select language <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" role="menu" ng-model="list">
+        <li ng-repeat="language in list" ng-click="setLanguage(language.language)"><a href="#">{{ language.name }}</a></li>
+      </ul>
+    </div>
+
+  <ul class="chatbox">
+    <li ng-repeat="message in messages">{{ message.from }}: {{ message.content }} ==> {{ message.translated }}</li>
+    <!-- <li ng-repeat="message in messages">{{ message.$id }}: {{ message }}</li> -->
+  </ul>
+ 
+  <form id="textbox" ng-submit="addMessage()">
+    <input type="text" ng-model="message">
+    <input type="submit" value="Send">
+  </form>
+
 </div>
