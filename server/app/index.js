@@ -8,6 +8,16 @@ module.exports = app;
 // function located at server/app/configure/index.js
 require('./configure')(app);
 
+var allowCrossDomain = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+ 
+    next();
+};
+
+app.use(allowCrossDomain);
+
 // Routes that will be accessed via AJAX should be prepended with
 // /api so they are isolated from our GET /* wildcard.
 app.use('/api', require('./routes'));

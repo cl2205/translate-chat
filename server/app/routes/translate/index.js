@@ -10,6 +10,7 @@ module.exports = router; // module.exports = function (app){ returns router}	// 
 router.get('/', function (req, res) {
     var url = 'https://www.googleapis.com/language/translate/v2';
     console.log("REQ.QUERY.LANGUAGE", req.query.language);
+    if (!req.query.language) req.query.language = 'zh-TW';
     var qs = {
         key: apiKey,
         target: req.query.language,

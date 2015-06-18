@@ -2,7 +2,7 @@
 var router = require('express').Router();
 module.exports = router;
 
-router.use('/tutorial', require('./tutorial'));
+router.use('/sms', require('./sms'));
 router.use('/members', require('./members'));
 
 

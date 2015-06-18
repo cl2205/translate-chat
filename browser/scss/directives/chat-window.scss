@@ -4,6 +4,14 @@ chat-window {
 	margin: 10%;
 }
 
+#chat-window {
+	border: solid 2px grey;
+	margin: 10px;
+	padding: 10px;
+	max-width: 50%;
+
+}
+
 .chatbox {
 	list-style: none;
 }

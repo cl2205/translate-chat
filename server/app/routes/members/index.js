@@ -17,14 +17,14 @@ var ensureAuthenticated = function (req, res, next) {
     }
 };
 
-router.post('/login', function (req, res, next) {
-    User.findOne({ email: req.body.email }).exec().then(function (user) {
-        if (!user) throw new Error('not found');
-        else if (!user.authenticate(req.body.password)) console.log("Invalid credentials");
-        else req.session.userId = user._id;
-        return req.session;
-    });
-});
+// router.post('/login', function (req, res, next) {
+//     User.findOne({ email: req.body.email }).exec().then(function (user) {
+//         if (!user) throw new Error('not found');
+//         else if (!user.authenticate(req.body.password)) console.log("Invalid credentials");
+//         else req.session.userId = user._id;
+//         return req.session;
+//     });
+// });
 
 router.get('/secret-stash', ensureAuthenticated, function (req, res) {
 

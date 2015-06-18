@@ -11,7 +11,6 @@ var server = require('http').createServer();
 var createApplication = function () {
     var app = require('./app');
     server.on('request', app); // Attach the Express application.
-    require('./io')(server);   // Attach socket.io.
 };
 
 var startServer = function () {

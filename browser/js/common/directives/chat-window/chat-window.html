@@ -16,10 +16,12 @@
       </ul>
     </div>
 
-  <ul class="chatbox">
-    <li ng-repeat="message in messages">{{ message.from }}: {{ message.content }} ==> {{ message.translated }}</li>
-    <!-- <li ng-repeat="message in messages">{{ message.$id }}: {{ message }}</li> -->
-  </ul>
+    <div id="chat-window">
+	  <ul class="chatbox">
+	    <li ng-repeat="message in messages">{{ message.from }}: {{ message.content }} ==> {{ message.translated }}</li>
+	    <!-- <li ng-repeat="message in messages">{{ message.$id }}: {{ message }}</li> -->
+	  </ul>
+    <div>
  
   <form id="textbox" ng-submit="addMessage()">
     <input type="text" ng-model="message">
