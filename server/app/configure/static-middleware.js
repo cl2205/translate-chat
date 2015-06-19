@@ -11,7 +11,7 @@ module.exports = function (app) {
     var npmPath = path.join(root, './node_modules');
     var bowerPath = path.join(root, './bower_components');
     var publicPath = path.join(root, './public');
-    var browserPath = path.join(root, './browser');
+    var browserPath = path.join(root, './browser/translateChat/www');
 
 
     app.use(favicon(app.getValue('faviconPath')));

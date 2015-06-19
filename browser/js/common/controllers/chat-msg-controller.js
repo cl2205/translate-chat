@@ -14,8 +14,8 @@
   // we pass our new chatMessages factory into the controller
 app.controller("ChatMsgController", function ($scope, chatMessages, TranslationFactory) {
 
-    $scope.user = "Guest " + Math.round(Math.random() * 100);
-
+    $scope.user = "John";
+    console.log("scope user", $scope.user);
     // we add chatMessages array to the scope to be used in our ng-repeat
     $scope.messages = chatMessages;
 
@@ -45,9 +45,6 @@ app.controller("ChatMsgController", function ($scope, chatMessages, TranslationF
 			.then(function (translatedMessage) {
 
 				$scope.translated = translatedMessage;
-
-				console.log("scope message", $scope.message);
-				console.log("translated", $scope.translated);
 			})
 
 			.then(function() {

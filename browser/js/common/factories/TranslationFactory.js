@@ -34,8 +34,6 @@ app.factory('TranslationFactory', function ($http) {
                 params: queryParams
             })
             .then(function (response) {
-                // console.log("factory languages data to return to controller", response.data.data.languages);
-                console.log("!!!!!!!!!!factory response.data DATA!!!!!!!!!!!!!", response.data);
                 return response.data;
             });
 

@@ -18,9 +18,11 @@ angular.module('translate.controllers', [])
 	// To listen for when this page is active (for example, to refresh data),
 	// listen for the $ionicView.enter event:
 	//
-	//$scope.$on('$ionicView.enter', function(e) {
-	//});
+
+	$scope.$on('$ionicView.enter', function(e) {
+	});
 	
+	$scope.targetLanguage = "zh-TW";
 	$scope.chats = Chats.all();
 	$scope.remove = function(chat) {
 		Chats.remove(chat);
@@ -28,7 +30,41 @@ angular.module('translate.controllers', [])
 })
 
 .controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
+	// get chat
 	$scope.chat = Chats.get($stateParams.chatId);
+	$scope.user = "Cat";
+
+	console.log("input field", $scope.input);
+	console.log("liveTranslate view", $scope.liveTranslateView);
+	// on user input, translate text
+	$scope.$watch('input', function(oldText, newText) {
+
+		Chats.translateWhileTyping(newText, $scope.targetLanguage)
+			.then(function(translatedText) {
+				$scope.liveTranslateView = translatedText; // show live view
+			})
+			.catch(function(err) {
+				console.log(err.message);
+			});
+	});
+
+	$scope.submitMessage = Chats.submitMessage()
+
+	.then(function() {
+		// calling $add on a synchronized array is like Array.push(),
+				// except that it saves the changes to our Firebase database!
+		$scope.messages.$add({
+			from: $scope.user,
+			content: $scope.input,
+			translatedContent: $scope.liveTranslateView
+		});
+	})
+
+	.then(function() {
+		$scope.input = ""; // clear the input field
+	})
+
+
 })
 
 .controller('AccountCtrl', function($scope) {
