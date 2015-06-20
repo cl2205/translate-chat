@@ -37,54 +37,78 @@ angular.module('translate.controllers', [])
 
 	});
 
-	$scope.goToChat = function(chat) {
-		console.log("CHAT ID", chat.id);
-		$state.go('tab.chat-detail', { chatId: chat.id });
-	};
-
 	$scope.remove = function(chat) {
 		Chats.remove(chat);
 	};
 })
 
-.controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
+.controller('ChatDetailCtrl', function($scope, $stateParams, Chats, $firebaseArray) {
+
 	// get chat
-	$scope.messages = Chats.get($stateParams.chatId);
+	Chats.get($stateParams.chatId).then(function(messages){
+		$scope.messages = messages;
+		console.log("scope messages", $scope.messages);
+	});
 
-	
-	// // $scope.messages
+	var messagesRef = refFp.child('messages/' + $stateParams.chatId);
 
-	// console.log("input field", $scope.input);
-	// console.log("liveTranslate view", $scope.liveTranslateView);
-	// // on user input, translate text
-	// $scope.$watch('input', function(oldText, newText) {
+	messagesRef.on("child_added", function(snapshot, prevChildKey) {
+		var newMessage = snapshot.val();
+		console.log("newMessage: ", newMessage);
+		if ($scope.messages) {
+			$scope.messages.push(newMessage);
+		}
+	})
+	// $scope.$watch("messages", function() {
 
-	// 	Chats.translateWhileTyping(newText, $scope.targetLanguage)
-	// 		.then(function(translatedText) {
-	// 			$scope.liveTranslateView = translatedText; // show live view
-	// 		})
-	// 		.catch(function(err) {
-	// 			console.log(err.message);
-	// 		});
-	// });
-
-	// $scope.submitMessage = Chats.submitMessage()
-
-	// .then(function() {
-	// 	// calling $add on a synchronized array is like Array.push(),
-	// 			// except that it saves the changes to our Firebase database!
-	// 	$scope.messages.$add({
-	// 		from: $scope.user,
-	// 		content: $scope.input,
-	// 		translatedContent: $scope.liveTranslateView
-	// 	});
 	// })
 
-	// .then(function() {
-	// 	$scope.input = ""; // clear the input field
-	// });
+	console.log("input field", $scope.input);
+	console.log("liveTranslate view", $scope.liveTranslateView);
+	// on user input, translate text
+	$scope.$watch('input', function(oldText, newText) {
 
+		if (oldText) {
+			Chats.translateWhileTyping(newText, $scope.targetLanguage)
+			.then(function(translatedText) {
+				$scope.liveTranslateView = translatedText; // show live view
+			})
+			.catch(function(err) {
+				console.log(err.message);
+			});
+		}
+	});
 
+	$scope.submitMessage = function() {
+		$scope.loggedInUser = "John";
+		// calling $add on a synchronized array is like Array.push(),
+				// except that it saves the changes to our Firebase database!
+		var messagesRef = refFp.child('messages/' + $stateParams.chatId);
+		messagesRef.push({
+			content: $scope.input,
+			from: $scope.loggedInUser,
+			translated: $scope.liveTranslateView
+		})
+		.then(function() {
+			$scope.input = "";
+			$scope.liveTranslateView = "";
+		});
+
+		// $scope.messages.push({
+		// 	from: $scope.loggedInUser,
+		// 	content: $scope.input,
+		// 	translatedContent: $scope.liveTranslateView
+		// });
+
+		// $scope.messages.$add({
+		// 	from: $scope.loggedInUser,
+		// 	content: $scope.input,
+		// 	translatedContent: $scope.liveTranslateView
+		// })
+		// .then(function() {
+		// 	$scope.input = ""; // clear the input field
+		// });
+	};
 })
 
 .controller('AccountCtrl', function($scope) {

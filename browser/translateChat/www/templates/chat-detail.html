@@ -6,29 +6,37 @@
 -->
 <ion-view view-title="{{chat.name}}">
   <ion-content class="padding">
-    <img ng-src="{{chat.face}}" style="width: 64px; height: 64px">
-<!--     <p ng-repeat="message in messages">
-      {{ message.translated }}
-    </p>
-    <p ng-repeat="">
+    <ion-list>
+      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="message in messages" type="item-text-wrap">
+        <h2>{{ message.from }}</h2>
+        <p>{{ message.translated }}</p>
+        <p>( {{ message.content }} )</p>
+    <!--     <p>{{ message.content }}</p> -->
 
-    </p> -->
+      </ion-item>
+    </ion-list>
 
-<!--     live Translate view -->
     <label class="item item-input">
     <input type="text" placeholder="Live Translate" ng-readonly="true" ng-model="liveTranslateView">
-  </label>
-<!--     live Translate view -->
+    </label>
+
+
+
+
   </ion-content>
+  <!--     live Translate view -->
+  
+
+<!--     live Translate view -->
 
   <ion-footer-bar class="bar-stable">
       <div class="item item-input-inset" style="width: 100%;">
         <label class="item-input-wrapper">
           <!--     input field -->
-          <input type="text" placeholder="Message" ng-model="input">
+          <input style="width: 100%;" type="text" placeholder="Message" ng-model="input">
           <!--     input field -->
         </label>
-        <button class="button button-small">
+        <button ng-click="submitMessage()" class="button button-small">
           Send
         </button>
       </div>

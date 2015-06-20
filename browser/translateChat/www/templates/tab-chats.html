@@ -1,8 +1,7 @@
 <ion-view view-title="Chats">
   <ion-content>
     <ion-list>
-      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="chat in chats" type="item-text-wrap" ng-click="goToChat(chat)">
-<!--       href="#/tab/chats/{{chat.id}}" -->
+      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="chat in chats" type="item-text-wrap" ui-sref="tab.chat-detail({ chatId: chat.id })"
         <img ng-src="{{chat.face}}">
         <h2>{{ chat.members.toString() }}</h2>
         <p>{{ chat.lastText}}</p>

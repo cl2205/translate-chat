@@ -16,12 +16,12 @@ angular.module('translate.factories', [])
 	//     "Kelly": { source_language: "zh-TW", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat1: true } }
 	// };
 
-	// var chats = {
-	//     "chat1": { id: 1, members: [ "John", "Kelly"], lastText: "Where are you?"},
-	//     "chat2": { id: 2, members: [ "John", "Obama" ], lastText: "I'm so pumped!!!" },
-	//     "chat3": { id: 3, members: [ "John", "Fullstack"], lastText: "I have big news for you..." },
-	//     "chat4": { id: 4, members: ["Fullstack", "Obama"], lastText: "I have a big news..." }
-	// };
+	var chats = {
+	    "chat1": { id: "chat1", members: [ "John", "Kelly"], lastText: "Where are you?"},
+	    "chat2": { id: "chat2", members: [ "John", "Obama" ], lastText: "I'm so pumped!!!" },
+	    "chat3": { id: "chat3", members: [ "John", "Fullstack"], lastText: "I have big news for you..." },
+	    "chat4": { id: "chat4", members: ["Fullstack", "Obama"], lastText: "I have a big news..." }
+	};
 
 var messages = {
 	"chat1": [ { from: "Kelly", content: "Je suis hungry. Wanna grab a bite?", translated: "I'm hungry. Wanna grab a bite?"}, { from: "John", content: "Sure, let's go to McDonald's", translated: "Sure, let's mange"}],
@@ -36,10 +36,12 @@ var messages = {
 	// chatsRef.set(chats);
 
 	var ref = new Firebase("https://fiery-torch-3361.firebaseio.com");
-	var refFp = new Fireproof(ref);
+	refFp = new Fireproof(ref);
 	Fireproof.bless($q);
 	
 	var messagesRefFb = ref.child('messages');
+  var chatsRefFb = ref.child('chats');
+  chatsRefFb.set(chats);
 	messagesRefFb.set(messages);
 	// Might use a resource here that returns a JSON array
 	// var chatList = $firebase(ref.child('chats')).$asArray();
@@ -85,10 +87,13 @@ var messages = {
 			chats.splice(chats.indexOf(chat), 1);
 		},
 
+
 		get: function(chatId) { // get chat for 
 			var messagesRef = refFp.child('messages/' + chatId);
-			messagesRef.then(function(messagesRef_snap) {
+      console.log("messagesRef", messagesRef);
+			return messagesRef.then(function(messagesRef_snap) {
 				var messages = messagesRef_snap.val();
+        console.log("messages in fact", messages);
 				return messages;
 			});
 		  
@@ -115,12 +120,13 @@ var messages = {
 		//   var tanslatedMsg =  
 		// },
 
-		sendMsg: function(to, text) {
+		submitMessage: function(to, text) {
 
 			var messageData = {
 				to: to,
 				text: text
 			};
+
 
 			return $http.post('/', messageData).then(function(sentMsg) {
 				console.log(sentMsg);
