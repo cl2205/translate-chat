@@ -58,15 +58,15 @@ angular.module('translate.factories', [])
       chats.splice(chats.indexOf(chat), 1);
     },
 
-    // get: function(chatId) { // get chat for 
-    //   for (var i = 0; i < usersChats.length; i++) {
-    //     if (usersChats[i].id === parseInt(chatId)) {
-    //       console.log("CHAT", usersChats[i]);
-    //       return usersChats[i];
-    //     }
-    //   }
-    //   return null;
-    // },
+    get: function(chatId) { // get chat for 
+      for (var i = 0; i < usersChats.length; i++) {
+        if (usersChats[i].id === parseInt(chatId)) {
+          console.log("CHAT", usersChats[i]);
+          return usersChats[i];
+        }
+      }
+      return null;
+    },
 
     translateWhileTyping: function(text, targetLanguage) {
       var queryParams = {

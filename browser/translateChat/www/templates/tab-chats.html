@@ -1,10 +1,10 @@
 <ion-view view-title="Chats">
   <ion-content>
     <ion-list>
-      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="person in chatsWith" type="item-text-wrap" href="#/tab/chats/{{chat.id}}">
+      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="chat in chatList" type="item-text-wrap" href="#/tab/chats/{{chat.id}}">
         <img ng-src="{{chat.face}}">
-        <h2>{{ person }}</h2>
-<!--         <p>{{chat.lastText}}</p> -->
+        <h2>{{ chat.chattingWith }}</h2>
+        <p>{{ chat.lastText}}</p>
     <!--     <p>{{chat.content}}</p>
         <p>{{chat.translated}}</p> -->
         <i class="icon ion-chevron-right icon-accessory"></i>

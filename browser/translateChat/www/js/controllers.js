@@ -28,24 +28,24 @@ angular.module('translate.controllers', [])
 
 	var users = {
 
-	    "john": { source_language: "en", contacts: { obama: true, fullstack: true, kelly: true }, chats: [ "chat1", "chat2", "chat3" ], phoneNumber: 9172542078 },
-	    "obama": { source_language: "en", contacts: { john: true, fullstack: true, kelly: true }, chats: { chat2: true, chat4: true }, phoneNumber: 9172542078 },
-	    "fullstack": { source_language: "fr", contacts: { john: true, obama: true, kelly: true }, chats: { chat3: true, chat4: true }, phoneNumber: 9172542078 },
-	    "kelly": { source_language: "zh-TW", contacts: { john: true, obama: true, kelly: true }, chats: { chat1: true } }
+	    "John": { source_language: "en", contacts: { Obama: true, Fullstack: true, Kelly: true }, chats: [ "chat1", "chat2", "chat3" ], phoneNumber: 9172542078 },
+	    "Obama": { source_language: "en", contacts: { John: true, Fullstack: true, Kelly: true }, chats: { chat2: true, chat4: true }, phoneNumber: 9172542078 },
+	    "Fullstack": { source_language: "fr", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat3: true, chat4: true }, phoneNumber: 9172542078 },
+	    "Kelly": { source_language: "zh-TW", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat1: true } }
 	};
 
 	var chats = {
-	    "chat1": { id: 1, members: [ "john", "kelly"] },
-	    "chat2": { id: 2, members: [ "john", "obama" ] },
-	    "chat3": { id: 3, members: [ "john", "fullstack"]},
-	    "chat4": { id: 4, members: ["fullstack", "obama"] }
+	    "chat1": { id: 1, members: [ "John", "Kelly"], lastText: "Where are you?"},
+	    "chat2": { id: 2, members: [ "John", "Obama" ], lastText: "I'm so pumped!!!" },
+	    "chat3": { id: 3, members: [ "John", "Fullstack"], lastText: "I have big news for you..." },
+	    "chat4": { id: 4, members: ["Fullstack", "Obama"], lastText: "I have a big news..." }
 	};
 
 
 	usersRef.set(users);  
 	chatsRef.set(chats);
 
-	$scope.loggedInUser = "john";
+	$scope.loggedInUser = "John";
 	$scope.targetLanguage = "zh-TW";
 	// $scope.chats = Chats.all($scope.loggedInUser);
 
@@ -64,7 +64,7 @@ angular.module('translate.controllers', [])
 	// 	};
 
 	// var johnsChats = ref.child('users/' + $scope.loggedInUser + '/chats' )
-	$scope.chatsWith = [];
+	$scope.chatList = [];
 
 	// _.pluck(_.where(usersChats, { 'john': 36, 'active': false }), 'user');
 	// var usersChats = $firebaseArray(ref.child('users/' + $scope.loggedInUser + '/chats'));
@@ -86,26 +86,38 @@ angular.module('translate.controllers', [])
 
     usersChats.once('value', function(chatId_snapshot) {	// array of chatIds
     	var chatIdArray = chatId_snapshot.val();
-    	console.log("chatIdArray", chatIdArray);
-    	// console.log("chatId snapshot", chatId_snapshot);
   
     	chatIdArray.forEach(function(chatId) { // for each chatId
-    		console.log("chatId", chatId);
+    		var otherUser;
     		$scope.chat = ref.child('chats/' + chatId);
-    		var chats = ref.child('chats/' + chatId + '/members'); // check that chat's members
-    		chats.once('value', function(members_snap) { // array of members
-    			var members = members_snap.val();
-    			console.log("members", members);
-    			members.forEach(function(member) {	// for each member
-    				console.log("member", member);
-    				if (member !== $scope.loggedInUser) {
-    					console.log("john is talking to " + member);
-    					$scope.chatsWith.push(member);
-    					console.log("chatting with", member);
-    				};
 
-    			});
-    		})
+    		var oneChat = ref.child('/chats/' + chatId);
+    		oneChat.once('value', function(snap) {
+    			console.log("snapval", snap.val());
+    			var oneChatObj = snap.val();
+    			oneChatObj.lastText
+    			oneChatObj.members.forEach(function(member) {
+    				if (member !== $scope.loggedInUser) {
+    					otherUser = member;
+    				}
+    			})
+    			$scope.chatList.push({ chattingWith: otherUser, lastText: oneChatObj.lastText});
+    		});
+
+    		// var chats = ref.child('chats/' + chatId + '/members'); // check that chat's members
+    		// chats.once('value', function(members_snap) { // array of members
+    		// 	var members = members_snap.val();
+    	
+    		// 	members.forEach(function(member) {	// for each member
+    				
+    		// 		if (member !== $scope.loggedInUser) {
+    					
+    		// 			$scope.chatList.push(member);
+    				
+    		// 		};
+
+    		// 	});
+    		// })
     	})
     })
 
@@ -151,23 +163,23 @@ angular.module('translate.controllers', [])
 
 .controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
 	// get chat
-	// $scope.chat = Chats.get($stateParams.chatId);
+	$scope.chat = Chats.get($stateParams.chatId);
 	
-	// // $scope.messages
+	// $scope.messages
 
-	// console.log("input field", $scope.input);
-	// console.log("liveTranslate view", $scope.liveTranslateView);
-	// // on user input, translate text
-	// $scope.$watch('input', function(oldText, newText) {
+	console.log("input field", $scope.input);
+	console.log("liveTranslate view", $scope.liveTranslateView);
+	// on user input, translate text
+	$scope.$watch('input', function(oldText, newText) {
 
-	// 	Chats.translateWhileTyping(newText, $scope.targetLanguage)
-	// 		.then(function(translatedText) {
-	// 			$scope.liveTranslateView = translatedText; // show live view
-	// 		})
-	// 		.catch(function(err) {
-	// 			console.log(err.message);
-	// 		});
-	// });
+		Chats.translateWhileTyping(newText, $scope.targetLanguage)
+			.then(function(translatedText) {
+				$scope.liveTranslateView = translatedText; // show live view
+			})
+			.catch(function(err) {
+				console.log(err.message);
+			});
+	});
 
 	// $scope.submitMessage = Chats.submitMessage()
 
