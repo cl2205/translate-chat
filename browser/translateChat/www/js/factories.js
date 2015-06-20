@@ -7,131 +7,159 @@ angular.module('translate.factories', [])
 //   return $firebaseAuth(ref);
 // })
 
-.factory('Chats', function ($rootScope, $http) {
+.factory('Chats', function ($rootScope, $http, $q) {
+		// var users = {
 
-  // var ref = new Firebase("https://fiery-torch-3361.firebaseio.com");
-  // chatsRef = ref.child('chats');
-  // usersRef = ref.child('users');
-  // messagesRef = ref.child('messages');
+	//     "John": { source_language: "en", contacts: { Obama: true, Fullstack: true, Kelly: true }, chats: [ "chat1", "chat2", "chat3" ], phoneNumber: 9172542078 },
+	//     "Obama": { source_language: "en", contacts: { John: true, Fullstack: true, Kelly: true }, chats: { chat2: true, chat4: true }, phoneNumber: 9172542078 },
+	//     "Fullstack": { source_language: "fr", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat3: true, chat4: true }, phoneNumber: 9172542078 },
+	//     "Kelly": { source_language: "zh-TW", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat1: true } }
+	// };
 
-  // var users = {
+	// var chats = {
+	//     "chat1": { id: 1, members: [ "John", "Kelly"], lastText: "Where are you?"},
+	//     "chat2": { id: 2, members: [ "John", "Obama" ], lastText: "I'm so pumped!!!" },
+	//     "chat3": { id: 3, members: [ "John", "Fullstack"], lastText: "I have big news for you..." },
+	//     "chat4": { id: 4, members: ["Fullstack", "Obama"], lastText: "I have a big news..." }
+	// };
 
-  //   "john": { source_language: "en", contacts: { obama: true, fullstack: true, kelly: true }, chats: { chat1: true, chat2: true, chat3: true }, phoneNumber: 9172542078 },
-  //   "obama": { source_language: "en", contacts: { john: true, fullstack: true, kelly: true }, chats: { chat2: true, chat4: true }, phoneNumber: 9172542078 },
-  //   "fullstack": { source_language: "fr", contacts: { john: true, obama: true, kelly: true }, chats: { chat3: true, chat4: true }, phoneNumber: 9172542078 },
-  //   "kelly": { source_language: "zh-TW", contacts: { john: true, obama: true, kelly: true }, chats: { chat1: true } }
-  // };
-
-  // var chats = {
-  //   "chat1": { id: 1, members: { john: true, kelly: true } },
-  //   "chat2": { id: 2, members: { john: true, obama: true } },
-  //   "chat3": { id: 3, members: { john: true, fullstack: true } },
-  //   "chat4": { id: 4, members: { fullstack: true, obama: true} }
-  // };
+var messages = {
+	"chat1": [ { from: "Kelly", content: "Je suis hungry. Wanna grab a bite?", translated: "I'm hungry. Wanna grab a bite?"}, { from: "John", content: "Sure, let's go to McDonald's", translated: "Sure, let's mange"}],
+	"chat2": [],
+	"chat3": [],
+	"chat4": []
+}
 
 
-  // usersRef.set(users);  
-  // chatsRef.set(chats);
-  
-  // .limitToLast(10);
-  
 
-  // Might use a resource here that returns a JSON array
-  // var chatList = $firebase(ref.child('chats')).$asArray();
+	// usersRef.set(users);  
+	// chatsRef.set(chats);
 
-  return {
+	var ref = new Firebase("https://fiery-torch-3361.firebaseio.com");
+	var refFp = new Fireproof(ref);
+	Fireproof.bless($q);
+	
+	var messagesRefFb = ref.child('messages');
+	messagesRefFb.set(messages);
+	// Might use a resource here that returns a JSON array
+	// var chatList = $firebase(ref.child('chats')).$asArray();
 
-    // all: function(user) {
-    //   var chatList = ref.child('chats');
+	return {
 
-    //   chatList.once('value', function(snapshot) {
-    //     var chatSnapshot = snapshot.val();
-    //     console.log("snapshot", chatSnapshot);
-    //     var usersChats = _.where(chatSnapshot, { members: { john: true } });
-    //     console.log("usersChats", usersChats);
-    //   });
+			all: function(user) {
 
-    //   // return usersChats;
-    // },
+			var usersChats = refFp.child('/users/' + user + '/chats');
 
-    remove: function(chat) {
-      chats.splice(chats.indexOf(chat), 1);
-    },
+			return usersChats.then(function(chatList_snapshot) {  // array of chatIds
+					var chatIdArray = chatList_snapshot.val();
+					return chatIdArray;
+				})
 
-    get: function(chatId) { // get chat for 
-      for (var i = 0; i < usersChats.length; i++) {
-        if (usersChats[i].id === parseInt(chatId)) {
-          console.log("CHAT", usersChats[i]);
-          return usersChats[i];
-        }
-      }
-      return null;
-    },
+				.then(function(chatIdArray) {
+					var chatListRefs = chatIdArray.map(function(chatId) {
+						var singleChatRef = refFp.child('/chats/' + chatId);
+						return singleChatRef;
+					});
+					return chatListRefs;
+				})
 
-    translateWhileTyping: function(text, targetLanguage) {
-      var queryParams = {
-        language: targetLanguage,
-        text: text
-      };
-    
-      return $http.get('/api/members/translate', {    // SERVER ROUTE
-        params: queryParams
-      })
+				.then(function(chatListRefs) {
+						var chatList = Promise.all(chatListRefs.map(function(singleChatRef) {
+							return singleChatRef.then(function(singleChat_snap) {
+								console.log(singleChat_snap.val());
+								return singleChat_snap.val();
+							})
+						}))
+						console.log("chatList", chatList);
+						return chatList;
+				})
 
-      .then(function (response) {
-          return response.data;
-      });
-    },
+				.then(function(chatList) {
+					return chatList;
+				})
 
-    // submitMessage: function() {
-    //   var tanslatedMsg =  
-    // },
+		},
 
-    sendMsg: function(to, text) {
 
-      var messageData = {
-        to: to,
-        text: text
-      };
+		remove: function(chat) {
+			chats.splice(chats.indexOf(chat), 1);
+		},
 
-      return $http.post('/', messageData).then(function(sentMsg) {
-        console.log(sentMsg);
-      });
-    }
+		get: function(chatId) { // get chat for 
+			var messagesRef = refFp.child('messages/' + chatId);
+			messagesRef.then(function(messagesRef_snap) {
+				var messages = messagesRef_snap.val();
+				return messages;
+			});
+		  
+		},
 
-  };  // end object
+
+
+		translateWhileTyping: function(text, targetLanguage) {
+			var queryParams = {
+				language: targetLanguage,
+				text: text
+			};
+		
+			return $http.get('/api/members/translate', {    // SERVER ROUTE
+				params: queryParams
+			})
+
+			.then(function (response) {
+					return response.data;
+			});
+		},
+
+		// submitMessage: function() {
+		//   var tanslatedMsg =  
+		// },
+
+		sendMsg: function(to, text) {
+
+			var messageData = {
+				to: to,
+				text: text
+			};
+
+			return $http.post('/', messageData).then(function(sentMsg) {
+				console.log(sentMsg);
+			});
+		}
+
+	};  // end object
 })
 
 
 .factory('Translate', function ($http) {
 
-  var queryParams;
+	var queryParams;
 
 });
 
 
 
-  //   name: 'Ben Sparrow',
-  //   lastText: 'You on your way?',
-  //   face: 'https://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png'
-  // }, {
-  //   id: 1,
-  //   name: 'Max Lynx',
-  //   lastText: 'Hey, it\'s me',
-  //   face: 'https://avatars3.githubusercontent.com/u/11214?v=3&s=460'
-  // },{
-  //   id: 2,
-  //   name: 'Adam Bradleyson',
-  //   lastText: 'I should buy a boat',
-  //   face: 'https://pbs.twimg.com/profile_images/479090794058379264/84TKj_qa.jpeg'
-  // }, {
-  //   id: 3,
-  //   name: 'Perry Governor',
-  //   lastText: 'Look at my mukluks!',
-  //   face: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-  // }, {
-  //   id: 4,
-  //   name: 'Mike Harrington',
-  //   lastText: 'This is wicked good ice cream.',
-  //   face: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-  // }];
+	//   name: 'Ben Sparrow',
+	//   lastText: 'You on your way?',
+	//   face: 'https://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png'
+	// }, {
+	//   id: 1,
+	//   name: 'Max Lynx',
+	//   lastText: 'Hey, it\'s me',
+	//   face: 'https://avatars3.githubusercontent.com/u/11214?v=3&s=460'
+	// },{
+	//   id: 2,
+	//   name: 'Adam Bradleyson',
+	//   lastText: 'I should buy a boat',
+	//   face: 'https://pbs.twimg.com/profile_images/479090794058379264/84TKj_qa.jpeg'
+	// }, {
+	//   id: 3,
+	//   name: 'Perry Governor',
+	//   lastText: 'Look at my mukluks!',
+	//   face: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
+	// }, {
+	//   id: 4,
+	//   name: 'Mike Harrington',
+	//   lastText: 'This is wicked good ice cream.',
+	//   face: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+	// }];
