@@ -30,20 +30,20 @@
 
   </ion-content>
 
-  
-
 
   <ion-footer-bar class="bar-stable">
+    <form ng-submit="submitMessage()" style="width: 100%;">
       <div class="item item-input-inset" style="width: 100%;">
         <label class="item-input-wrapper">
           <!--     input field -->
           <input style="width: 100%;" type="text" placeholder="Message" ng-model="input">
           <!--     input field -->
         </label>
-        <button ng-click="submitMessage()" class="button button-small">
+        <button type="submit" class="button button-small">
           Send
         </button>
       </div>
+    </form>
   </ion-footer-bar>
 </ion-view>
   <!--     <div class="bar bar-footer">
