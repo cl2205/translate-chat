@@ -8,26 +8,30 @@
   <ion-content class="padding">
     <ion-list>
       <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="message in messages" type="item-text-wrap">
-        <h2>{{ message.from }}</h2>
-        <p>{{ message.translated }}</p>
-        <p>( {{ message.content }} )</p>
+<!--         <h2>{{ message.from }}</h2> -->
+      <div class="row">
+        <div class="col-15">
+          <h2>{{ message.from }}: </h2>
+        </div>
+        <div class="col-85" style="margin-left: 1em;">
+          </p>{{ message.translated }}</p>
+          <p>( {{ message.content }} )</p>
+        </div>
+      </div>
     <!--     <p>{{ message.content }}</p> -->
 
       </ion-item>
     </ion-list>
-
+  <!--     live Translate view -->
     <label class="item item-input">
     <input type="text" placeholder="Live Translate" ng-readonly="true" ng-model="liveTranslateView">
     </label>
-
-
-
+<!--     live Translate view -->
 
   </ion-content>
-  <!--     live Translate view -->
+
   
 
-<!--     live Translate view -->
 
   <ion-footer-bar class="bar-stable">
       <div class="item item-input-inset" style="width: 100%;">

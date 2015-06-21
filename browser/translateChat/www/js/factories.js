@@ -48,38 +48,51 @@ var messages = {
 
 	return {
 
-			all: function(user) {
+		all: function(user) {
 
-			var usersChats = refFp.child('/users/' + user + '/chats');
+		var usersChats = refFp.child('/users/' + user + '/chats');
 
-			return usersChats.then(function(chatList_snapshot) {  // array of chatIds
-					var chatIdArray = chatList_snapshot.val();
-					return chatIdArray;
-				})
+		return usersChats.then(function(chatList_snapshot) {  // array of chatIds
+				var chatIdArray = chatList_snapshot.val();
+				return chatIdArray;
+			})
 
-				.then(function(chatIdArray) {
-					var chatListRefs = chatIdArray.map(function(chatId) {
-						var singleChatRef = refFp.child('/chats/' + chatId);
-						return singleChatRef;
-					});
-					return chatListRefs;
-				})
+			.then(function(chatIdArray) {
+				var chatListRefs = chatIdArray.map(function(chatId) {
+					var singleChatRef = refFp.child('/chats/' + chatId);
+					return singleChatRef;
+				});
+				return chatListRefs;
+			})
 
-				.then(function(chatListRefs) {
-						var chatList = Promise.all(chatListRefs.map(function(singleChatRef) {
-							return singleChatRef.then(function(singleChat_snap) {
-								console.log(singleChat_snap.val());
-								return singleChat_snap.val();
-							})
-						}))
-						console.log("chatList", chatList);
-						return chatList;
-				})
-
-				.then(function(chatList) {
+			.then(function(chatListRefs) {
+					var chatList = Promise.all(chatListRefs.map(function(singleChatRef) {
+						return singleChatRef.then(function(singleChat_snap) {
+							console.log(singleChat_snap.val());
+							return singleChat_snap.val();
+						})
+					}))
+					console.log("chatList", chatList);
 					return chatList;
-				})
+			})
 
+			.then(function(chatList) {
+				return chatList;
+			})
+
+		},
+
+		sendMessage: function(message, chatId) {
+			var messagesRef = refFp.child('messages/' + chatId);
+			console.log("chatId", chatId);
+			console.log("message", message);
+			return messagesRef.push(message).then(function() {
+				console.log("saved");
+			});
+
+			// var messageData = {
+			// 	to: message.
+			// }
 		},
 
 
@@ -87,13 +100,29 @@ var messages = {
 			chats.splice(chats.indexOf(chat), 1);
 		},
 
+		getOtherUser: function(chatId, user) {
+			console.log("user", user);
+			var chatRef = refFp.child('chats/' + chatId);
+			return chatRef.then(function(chatRef_snap) {
+				var chat = chatRef_snap.val();
+				console.log("chat", chat);
+				var otherUser = _.filter(chat.members, function(member) {
+					return member !== user;
+				});
+				console.log("otherUser", otherUser);
+				otherUser = otherUser.toString();
+				return otherUser;
+			});
+		},
+
 
 		get: function(chatId) { // get chat for 
+
 			var messagesRef = refFp.child('messages/' + chatId);
-      console.log("messagesRef", messagesRef);
+      		console.log("messagesRef", messagesRef);
 			return messagesRef.then(function(messagesRef_snap) {
 				var messages = messagesRef_snap.val();
-        console.log("messages in fact", messages);
+        		console.log("messages in fact", messages);
 				return messages;
 			});
 		  

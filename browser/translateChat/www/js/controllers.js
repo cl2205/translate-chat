@@ -33,6 +33,7 @@ angular.module('translate.controllers', [])
 			})
 		});
 
+
 		$scope.chats = chatList; 
 
 	});
@@ -43,7 +44,11 @@ angular.module('translate.controllers', [])
 })
 
 .controller('ChatDetailCtrl', function($scope, $stateParams, Chats, $firebaseArray) {
-
+	$scope.loggedInUser = "John";
+	
+	Chats.getOtherUser($stateParams.chatId, $scope.loggedInUser).then(function(user) {
+		$scope.otherUser = user;
+	});
 	// get chat
 	Chats.get($stateParams.chatId).then(function(messages){
 		$scope.messages = messages;
@@ -80,34 +85,20 @@ angular.module('translate.controllers', [])
 	});
 
 	$scope.submitMessage = function() {
+		console.log("chattingwithuser", $scope.otherUser);
 		$scope.loggedInUser = "John";
-		// calling $add on a synchronized array is like Array.push(),
-				// except that it saves the changes to our Firebase database!
-		var messagesRef = refFp.child('messages/' + $stateParams.chatId);
-		messagesRef.push({
+		var message = {
 			content: $scope.input,
 			from: $scope.loggedInUser,
+			to: $scope.otherUser,
 			translated: $scope.liveTranslateView
-		})
+		};
+
+		Chats.sendMessage(message, $stateParams.chatId)
 		.then(function() {
 			$scope.input = "";
 			$scope.liveTranslateView = "";
 		});
-
-		// $scope.messages.push({
-		// 	from: $scope.loggedInUser,
-		// 	content: $scope.input,
-		// 	translatedContent: $scope.liveTranslateView
-		// });
-
-		// $scope.messages.$add({
-		// 	from: $scope.loggedInUser,
-		// 	content: $scope.input,
-		// 	translatedContent: $scope.liveTranslateView
-		// })
-		// .then(function() {
-		// 	$scope.input = ""; // clear the input field
-		// });
 	};
 })
 
