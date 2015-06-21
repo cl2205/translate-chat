@@ -11,9 +11,9 @@ angular.module('translate.factories', [])
 	var users = {
 
 	    "John": { source_language: "en", contacts: { Obama: true, Fullstack: true, Kelly: true }, chats: [ "chat1", "chat2", "chat3" ], phoneNumber: +16467831204 },
+	    "Kelly": { source_language: "zh-TW", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat1: true }, phoneNumber: +19172542078 },
 	    "Obama": { source_language: "en", contacts: { John: true, Fullstack: true, Kelly: true }, chats: { chat2: true, chat4: true }, phoneNumber: +19172542078 },
-	    "Fullstack": { source_language: "fr", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat3: true, chat4: true }, phoneNumber: +19172542078 },
-	    "Kelly": { source_language: "zh-TW", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat1: true }, phoneNumber: +19172542078 }
+	    "Fullstack": { source_language: "fr", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat3: true, chat4: true }, phoneNumber: +19172542078 }
 	};
 
 	var chats = {
@@ -88,18 +88,19 @@ angular.module('translate.factories', [])
 			var messagesRef = refFp.child('messages/' + chatId);
 
 			messagesRef.push(message).then(function() {
-				console.log("saved");
+				// console.log("saved sent Message");
 			});
+
 
 			var userRef = refFp.child('users/' + message.to);
 
 			return userRef.then(function(user_snap) {
 				var recipient = user_snap.val();
-			
+				// console.log("recipient to sent msg", recipient);
 				return recipient.phoneNumber;
 			})
 			.then(function(recipientPhone) {
-
+				// console.log('recipientPhone', recipientPhone);
 				var messageData = {
 					phone: recipientPhone,
 					message: message.translated
@@ -107,14 +108,9 @@ angular.module('translate.factories', [])
 
 
 				return $http.post('/api/sms/sendmsg', messageData).then(function(sentMsg) {
-				console.log(sentMsg);
+				// console.log("sentMsg", sentMsg);
 				});
 			});
-
-			
-			
-			
-
 	
 		},
 
@@ -124,15 +120,15 @@ angular.module('translate.factories', [])
 		},
 
 		getOtherUser: function(chatId, user) {
-			console.log("user", user);
+			// console.log("user", user);
 			var chatRef = refFp.child('chats/' + chatId);
 			return chatRef.then(function(chatRef_snap) {
 				var chat = chatRef_snap.val();
-				console.log("chat", chat);
+				// console.log("chat", chat);
 				var otherUser = _.filter(chat.members, function(member) {
 					return member !== user;
 				});
-				console.log("otherUser", otherUser);
+				// console.log("otherUser", otherUser);
 				otherUser = otherUser.toString();
 				return otherUser;
 			});
@@ -142,10 +138,10 @@ angular.module('translate.factories', [])
 		get: function(chatId) { // get chat for 
 
 			var messagesRef = refFp.child('messages/' + chatId);
-      		console.log("messagesRef", messagesRef);
+      		// console.log("messagesRef", messagesRef);
 			return messagesRef.then(function(messagesRef_snap) {
 				var messages = messagesRef_snap.val();
-        		console.log("messages in fact", messages);
+        		// console.log("messages in fact", messages);
 				return messages;
 			});
 		  
@@ -168,22 +164,6 @@ angular.module('translate.factories', [])
 			});
 		},
 
-		// submitMessage: function() {
-		//   var tanslatedMsg =  
-		// },
-
-		submitMessage: function(to, text) {
-
-			var messageData = {
-				to: to,
-				text: text
-			};
-
-
-			return $http.post('/', messageData).then(function(sentMsg) {
-				console.log(sentMsg);
-			});
-		}
 
 	};  // end object
 })
@@ -194,8 +174,6 @@ angular.module('translate.factories', [])
 	var queryParams;
 
 });
-
-
 
 	//   name: 'Ben Sparrow',
 	//   lastText: 'You on your way?',

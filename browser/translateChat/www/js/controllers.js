@@ -1,3 +1,5 @@
+//Synchronous XMLHttpRequest on the main thread is deprecated because of its detrimental effects to the end user's experience. For more help, check http://xhr.spec.whatwg.org/.
+
 angular.module('translate.controllers', [])
 
 .controller('LoginCtrl', function($scope) {
@@ -51,29 +53,23 @@ angular.module('translate.controllers', [])
 	});
 	// get chat
 	Chats.get($stateParams.chatId).then(function(messages){
-		$scope.messages = messages;
-		console.log("scope messages", $scope.messages);
+		$scope.messages = messages || [];
+		// console.log("scope messages", $scope.messages);
 	});
 
 	var messagesRef = refFp.child('messages/' + $stateParams.chatId);
 
 	messagesRef.on("child_added", function(snapshot, prevChildKey) {
 		var newMessage = snapshot.val();
-		console.log("newMessage: ", newMessage);
+		// console.log("newMessage: ", newMessage);
 		if ($scope.messages) {
 			$scope.messages.push(newMessage);	// SUPER LAGGED - 10 mins?
-			console.log("pushed");
-		} else {
-			console.log("none");
+			_.defer(function(){
+				$scope.$apply();
+			});
 		}
+	});
 
-	})
-	// $scope.$watch("messages", function() {
-
-	// })
-
-	console.log("input field", $scope.input);
-	console.log("liveTranslate view", $scope.liveTranslateView);
 	// on user input, translate text
 	$scope.$watch('input', function(oldText, newText) {
 
@@ -89,7 +85,7 @@ angular.module('translate.controllers', [])
 	});
 
 	$scope.submitMessage = function() {
-		console.log("chattingwithuser", $scope.otherUser);
+		// console.log("chattingwithuser", $scope.otherUser);
 		$scope.loggedInUser = "John";
 		var message = {
 			content: $scope.input,
