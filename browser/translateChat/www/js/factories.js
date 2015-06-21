@@ -8,13 +8,13 @@ angular.module('translate.factories', [])
 // })
 
 .factory('Chats', function ($rootScope, $http, $q) {
-		// var users = {
+	var users = {
 
-	//     "John": { source_language: "en", contacts: { Obama: true, Fullstack: true, Kelly: true }, chats: [ "chat1", "chat2", "chat3" ], phoneNumber: 9172542078 },
-	//     "Obama": { source_language: "en", contacts: { John: true, Fullstack: true, Kelly: true }, chats: { chat2: true, chat4: true }, phoneNumber: 9172542078 },
-	//     "Fullstack": { source_language: "fr", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat3: true, chat4: true }, phoneNumber: 9172542078 },
-	//     "Kelly": { source_language: "zh-TW", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat1: true } }
-	// };
+	    "John": { source_language: "en", contacts: { Obama: true, Fullstack: true, Kelly: true }, chats: [ "chat1", "chat2", "chat3" ], phoneNumber: +16467831204 },
+	    "Obama": { source_language: "en", contacts: { John: true, Fullstack: true, Kelly: true }, chats: { chat2: true, chat4: true }, phoneNumber: +19172542078 },
+	    "Fullstack": { source_language: "fr", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat3: true, chat4: true }, phoneNumber: +19172542078 },
+	    "Kelly": { source_language: "zh-TW", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat1: true }, phoneNumber: +19172542078 }
+	};
 
 	var chats = {
 	    "chat1": { id: "chat1", members: [ "John", "Kelly"], lastText: "Where are you?"},
@@ -23,12 +23,12 @@ angular.module('translate.factories', [])
 	    "chat4": { id: "chat4", members: ["Fullstack", "Obama"], lastText: "I have a big news..." }
 	};
 
-var messages = {
-	"chat1": [ { from: "Kelly", content: "Je suis hungry. Wanna grab a bite?", translated: "I'm hungry. Wanna grab a bite?"}, { from: "John", content: "Sure, let's go to McDonald's", translated: "Sure, let's mange"}],
-	"chat2": [],
-	"chat3": [],
-	"chat4": []
-}
+	var messages = {
+		"chat1": [ { from: "Kelly", content: "Je suis hungry. Wanna grab a bite?", translated: "I'm hungry. Wanna grab a bite?"}, { from: "John", content: "Sure, let's go to McDonald's", translated: "Sure, let's mange"}],
+		"chat2": [],
+		"chat3": [],
+		"chat4": []
+	}
 
 
 
@@ -40,8 +40,10 @@ var messages = {
 	Fireproof.bless($q);
 	
 	var messagesRefFb = ref.child('messages');
-  var chatsRefFb = ref.child('chats');
-  chatsRefFb.set(chats);
+  	var chatsRefFb = ref.child('chats');
+  	var usersRefFb = ref.child('users');
+  	usersRefFb.set(users);
+  	chatsRefFb.set(chats);
 	messagesRefFb.set(messages);
 	// Might use a resource here that returns a JSON array
 	// var chatList = $firebase(ref.child('chats')).$asArray();
@@ -84,15 +86,36 @@ var messages = {
 
 		sendMessage: function(message, chatId) {
 			var messagesRef = refFp.child('messages/' + chatId);
-			console.log("chatId", chatId);
-			console.log("message", message);
-			return messagesRef.push(message).then(function() {
+
+			messagesRef.push(message).then(function() {
 				console.log("saved");
 			});
 
-			// var messageData = {
-			// 	to: message.
-			// }
+			var userRef = refFp.child('users/' + message.to);
+
+			return userRef.then(function(user_snap) {
+				var recipient = user_snap.val();
+			
+				return recipient.phoneNumber;
+			})
+			.then(function(recipientPhone) {
+
+				var messageData = {
+					phone: recipientPhone,
+					message: message.translated
+				};
+
+
+				return $http.post('/api/sms/sendmsg', messageData).then(function(sentMsg) {
+				console.log(sentMsg);
+				});
+			});
+
+			
+			
+			
+
+	
 		},
 
 
@@ -136,7 +159,7 @@ var messages = {
 				text: text
 			};
 		
-			return $http.get('/api/members/translate', {    // SERVER ROUTE
+			return $http.get('/api/translate', {    // SERVER ROUTE
 				params: queryParams
 			})
 

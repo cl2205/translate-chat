@@ -61,8 +61,12 @@ angular.module('translate.controllers', [])
 		var newMessage = snapshot.val();
 		console.log("newMessage: ", newMessage);
 		if ($scope.messages) {
-			$scope.messages.push(newMessage);
+			$scope.messages.push(newMessage);	// SUPER LAGGED - 10 mins?
+			console.log("pushed");
+		} else {
+			console.log("none");
 		}
+
 	})
 	// $scope.$watch("messages", function() {
 

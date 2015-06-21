@@ -6,6 +6,7 @@ var apiKey = app.getValue('env').TRANSLATE.apiKey;
 
 module.exports = router; // module.exports = function (app){ returns router}	// passing app into function
 
+//api/translate
 
 router.get('/', function (req, res) {
     var url = 'https://www.googleapis.com/language/translate/v2';
