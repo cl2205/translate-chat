@@ -44,6 +44,7 @@ function translate(msg, targetLang) {
 
 
 router.post('/', function(req, res, next) {
+	console.log("hit post route");
 
  	var ref = new Firebase("https://fiery-torch-3361.firebaseio.com");
 
@@ -56,23 +57,24 @@ router.post('/', function(req, res, next) {
  	usersRef.then(function(usersRef_snap) {	// find users that match phone #s
  		var users = usersRef_snap.val();
  		var sender = _.findKey(users, { 'phoneNumber' : +req.body.From }) // convert to # with +
+ 		// if sender is undefined, create a new user, and create a new chat with the recipient and sender
  		var recipient = _.findKey(users, { 'phoneNumber' : +req.body.To } )
  		message.from = sender;
  		message.to = recipient;
  		recipientLanguage = users[recipient].source_language;
- 		// console.log("recipientLanguage", recipientLanguage);
- 		// console.log("sender", sender);
- 		// console.log("recipient", recipient);
+ 		console.log("recipientLanguage", recipientLanguage);
+ 		console.log("sender", sender);
+ 		console.log("recipient", recipient);
  		var chatMembers = [ sender, recipient ];
- 		// console.log("chatMembers", chatMembers);
+ 		console.log("chatMembers", chatMembers);
  		return chatMembers;
  	}).then(function(chatMembers) {	// find chats where members contain those users
  		var chatsRef = refFp.child('/chats');
  		return chatsRef.then(function(chats_snap){
  			var chats = chats_snap.val();
- 			// console.log('chats', chats);
+ 			console.log('chats', chats);
  			var chatId = _.findKey(chats, { members: [ chatMembers[0], chatMembers[1] ] });
- 			// console.log("found chatId", chatId);
+ 			console.log("found chatId", chatId);
  			return chatId;
  		})
  	}).then(function(chatId) {
@@ -80,7 +82,7 @@ router.post('/', function(req, res, next) {
  		return translate(message.content, recipientLanguage) // translate message
  			.then(function(translatedMsg) {
  				message.translated = translatedMsg;
- 				// console.log("translated message", message.translated); // translate message
+ 				console.log("translated message", message.translated); // translate message
  				return messagesRef.push(message).then(function() { // use Twilo client.messages?
  					console.log("saved");
  				})

@@ -15,7 +15,9 @@ angular.module('translate.controllers', [])
 
 })
 
-.controller('DashCtrl', function($scope) {})
+.controller('DashCtrl', function($scope) {
+	
+})
 
 .controller('ChatsCtrl', function($scope, Chats, $rootScope, $firebaseArray, $stateParams, $state) {
 	// With the new view caching in Ionic, Controllers are only called
@@ -28,7 +30,7 @@ angular.module('translate.controllers', [])
 	});
 
 	$scope.loggedInUser = "John";
-	$scope.targetLanguage = "zh-TW";
+	$scope.targetLanguage;
 
 	$scope.$watchCollection('chats', function(newChats, oldChats) {
 		console.log("updating chats");
@@ -149,6 +151,7 @@ angular.module('translate.controllers', [])
 		console.log("set language called");
 		$scope.targetLanguage = languageCode;// selected language from select
 		console.log("$scope targetLanguage", $scope.targetLanguage);
+		$scope.closeModal();
     };
 
 	$ionicModal.fromTemplateUrl('templates/language-select.html', {
@@ -162,8 +165,6 @@ angular.module('translate.controllers', [])
 	    // get supported languages list
     	Chats.getLanguages()
 		.then(function(languageList) {
-			console.log("languagelist", languageList);
-			// console.log("a language", languageList[0].name)
 			$scope.list = languageList;	// array of objects { language: zh-CN, name: Chinese }
 		});
 	  };
@@ -191,8 +192,50 @@ angular.module('translate.controllers', [])
     };
 })
 
-.controller('AccountCtrl', function($scope) {
+.controller('AccountCtrl', function($scope, $ionicModal, Chats) {
+	$scope.loggedInUser = "John";
+
 	$scope.settings = {
 		enableFriends: true
 	};
+
+	$ionicModal.fromTemplateUrl('templates/language-select.html', {
+	    scope: $scope,
+	    animation: 'slide-in-up'
+	  }).then(function(modal) {
+	    $scope.modal = modal;
+	  });
+
+	  $scope.openModal = function() {
+	  	console.log("open modal");
+	    $scope.modal.show();
+	    console.log("open modal");
+	    // get supported languages list
+    	Chats.getLanguages()
+		.then(function(languageList) {
+			console.log("got language list");
+			$scope.list = languageList;	// array of objects { language: zh-CN, name: Chinese }
+		});
+	  };
+
+	  $scope.closeModal = function() {
+	    $scope.modal.hide();
+	  };
+
+	  // set source language
+	  $scope.setLanguage = function(languageCode) {
+		console.log("set language called");
+		console.log("logged in user", $scope.loggedInUser);
+		$scope.sourceLanguage = languageCode;// selected language from select
+		console.log("$scope sourceLanguage", $scope.sourceLanguage);
+		Chats.setSourceLanguage($scope.loggedInUser, languageCode)
+		.then(function() {
+			console.log("source language updated");
+			$scope.closeModal();
+		}).catch(function(err) {
+			console.log(err);
+		})
+		
+    };
+
 });

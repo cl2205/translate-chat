@@ -1,12 +1,18 @@
 <ion-modal-view>
     <ion-header-bar>
-      <h1 class="title">Select Target Language</h1>
+      <h1 class="title">Select Language</h1>
     </ion-header-bar>
     <ion-content overflow-scroll="true">
+    <div class="list list-inset">
+      <label class="item item-input">
+      <i class="icon ion-search placeholder-icon"></i>
+      <input type="text" placeholder="Search" ng-model="searchText">
+      </label>
+  </div>
     
       <div class="list">
 <!-- ng-click="setLanguage(language.language)" -->
-        <label ng-repeat="language in list" ng-click="setLanguage(language.language)" class="item item-radio">
+        <label ng-repeat="language in list | filter:searchText" ng-click="setLanguage(language.language)" class="item item-radio">
           <input type="radio" name="group">
           <div class="item-content">
           {{ language.name }}
@@ -14,8 +20,5 @@
           <i class="radio-icon ion-checkmark"></i>
         </label>
       </div>
-
-
-
     </ion-content>
 </ion-modal-view>

@@ -11,7 +11,7 @@ angular.module('translate.factories', [])
 	var users = {
 
 	    "John": { source_language: "en", contacts: { Obama: true, Fullstack: true, Kelly: true }, chats: [ "chat1", "chat2", "chat3" ], phoneNumber: +16467831204 },
-	    "Kelly": { source_language: "zh-TW", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat1: true }, phoneNumber: +19172542078 },
+	    "Kelly": { source_language: "zh-TW", contacts: { John: true, Obama: true, Fullstack: true }, chats: { chat1: true }, phoneNumber: +13236329813 },
 	    "Obama": { source_language: "en", contacts: { John: true, Fullstack: true, Kelly: true }, chats: { chat2: true, chat4: true }, phoneNumber: +19172542078 },
 	    "Fullstack": { source_language: "fr", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat3: true, chat4: true }, phoneNumber: +19172542078 }
 	};
@@ -40,9 +40,9 @@ angular.module('translate.factories', [])
 	var messagesRefFb = ref.child('messages');
   	var chatsRefFb = ref.child('chats');
   	var usersRefFb = ref.child('users');
- //  	usersRefFb.set(users);
- //  	chatsRefFb.set(chats);
-	// messagesRefFb.set(messages);
+  	usersRefFb.set(users);
+  	chatsRefFb.set(chats);
+	messagesRefFb.set(messages);
 	// Might use a resource here that returns a JSON array
 	// var chatList = $firebase(ref.child('chats')).$asArray();
 
@@ -197,6 +197,22 @@ angular.module('translate.factories', [])
                 return response.data;
             });
 
+        },
+
+        setSourceLanguage: function(user, languageCode) {
+        	console.log("user:", user);
+        	console.log("languageCode", languageCode);
+        	console.log("set source language");
+        	var userRef = refFp.child('/users/' + user);
+
+        	return userRef.update({
+        		"source_language": languageCode
+        	}).then(function() {
+        		console.log("user with updated sourcelang");
+        		return;
+        	}).catch(function(err) {
+        		console.log("Updated source language could not be saved: " + err);
+        	})
         },
 
 		remove: function(chat) {
