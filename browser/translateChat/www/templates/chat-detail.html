@@ -4,16 +4,17 @@
   The FriendsCtrl pulls data from the Friends service (service.js)
   The Friends service returns an array of friend data
 -->
+
 <ion-view view-title="{{chat.name}}">
   <ion-content class="padding">
     <ion-list>
-      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="message in messages" type="item-text-wrap">
+      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="message in messages" type="item-text-wrap" style="padding-left: 10px">
 <!--         <h2>{{ message.from }}</h2> -->
       <div class="row">
-        <div class="col-15">
+        <div class="col-25">
           <h2>{{ message.from }}: </h2>
         </div>
-        <div class="col-85" style="margin-left: 1em;">
+        <div class="col-75" style="margin-left: 2px;">
           </p>{{ message.translated }}</p>
           <p>( {{ message.content }} )</p>
         </div>
@@ -28,6 +29,12 @@
     </label>
 <!--     live Translate view -->
 
+    <ion-infinite-scroll
+      ng-if="moreDataCanBeLoaded()"
+      icon="ion-loading-c"
+      on-infinite="loadMoreData()"
+      distance="1%">
+    </ion-infinite-scroll>
   </ion-content>
 
 

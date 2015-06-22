@@ -58,6 +58,7 @@ angular.module('translateChat', ['ionic', 'firebase', 'translate.controllers', '
 
   // List of Chats View
   .state('tab.chats', {
+      cache: false,
       url: '/chats',
       views: {
         'tab-chats': {

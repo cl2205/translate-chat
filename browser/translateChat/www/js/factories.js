@@ -17,34 +17,32 @@ angular.module('translate.factories', [])
 	};
 
 	var chats = {
-	    "chat1": { id: "chat1", members: [ "John", "Kelly"], lastText: "Where are you?"},
-	    "chat2": { id: "chat2", members: [ "John", "Obama" ], lastText: "I'm so pumped!!!" },
-	    "chat3": { id: "chat3", members: [ "John", "Fullstack"], lastText: "I have big news for you..." },
-	    "chat4": { id: "chat4", members: ["Fullstack", "Obama"], lastText: "I have a big news..." }
+	    "chat1": { id: "chat1", members: [ "John", "Kelly"] },
+	    "chat2": { id: "chat2", members: [ "John", "Obama" ] },
+	    "chat3": { id: "chat3", members: [ "John", "Fullstack"] },
+	    "chat4": { id: "chat4", members: ["Fullstack", "Obama"] }
 	};
 
 	var messages = {
-		"chat1": [ { from: "Kelly", content: "Je suis hungry. Wanna grab a bite?", translated: "I'm hungry. Wanna grab a bite?"}, { from: "John", content: "Sure, let's go to McDonald's", translated: "Sure, let's mange"}],
-		"chat2": [],
+		"chat1": [ { from: "Kelly", content: "I'm hungry. Wanna grab a bite?", translated: "Je suis hungry. Wanna manger?"}, { from: "John", content: "Sure, let's go to McDonald's", translated: "Sure, let's mange"}],
+		"chat2": [ { from: "John", content: "I'm bored.", translated: "Hola!"}, { from: "Obama", content: "Let's play some ball before I give the State of the Union tonight.", translated: "Gracias!"}],
 		"chat3": [],
-		"chat4": []
+		"chat4": [],
+	
 	}
 
-
-
-	// usersRef.set(users);  
-	// chatsRef.set(chats);
 
 	var ref = new Firebase("https://fiery-torch-3361.firebaseio.com");
 	refFp = new Fireproof(ref);
 	Fireproof.bless($q);
+	// refFp.remove();
 	
 	var messagesRefFb = ref.child('messages');
   	var chatsRefFb = ref.child('chats');
   	var usersRefFb = ref.child('users');
-  	usersRefFb.set(users);
-  	chatsRefFb.set(chats);
-	messagesRefFb.set(messages);
+ //  	usersRefFb.set(users);
+ //  	chatsRefFb.set(chats);
+	// messagesRefFb.set(messages);
 	// Might use a resource here that returns a JSON array
 	// var chatList = $firebase(ref.child('chats')).$asArray();
 
@@ -70,11 +68,11 @@ angular.module('translate.factories', [])
 			.then(function(chatListRefs) {
 					var chatList = Promise.all(chatListRefs.map(function(singleChatRef) {
 						return singleChatRef.then(function(singleChat_snap) {
-							console.log(singleChat_snap.val());
+							// console.log(singleChat_snap.val());
 							return singleChat_snap.val();
 						})
 					}))
-					console.log("chatList", chatList);
+					// console.log("chatList", chatList);
 					return chatList;
 			})
 
@@ -83,6 +81,45 @@ angular.module('translate.factories', [])
 			})
 
 		},
+
+		getLastTextOfChat: function(chatId) {
+			var messagesRef = refFp.child('/messages/' + chatId);
+			return messagesRef.limitToLast(1).then(function(messages_snap) {
+				console.log("last text snapshot", messages_snap.val());
+		
+				var lastText = messages_snap.val();
+				if (!lastText) {
+					console.log("if last text snap is undefined, should go here");
+					return "No messages available.";
+				} else {
+					console.log("lasttext1", lastText["1"]);
+					console.log("lasttext for 3rd", lastText[0]);
+					var content = _.pluck(lastText, 'content').toString();
+					console.log("will this work?", content);
+					// return lastText["1"];
+					return content;
+				}
+			})
+		},
+
+
+		get: function(chatId) { // get chat for 
+
+			var messagesRef = refFp.child('messages/' + chatId);
+      		// console.log("messagesRef", messagesRef);
+			return messagesRef.limitToLast(5).then(function(messagesRef_snap) {
+				var messages = messagesRef_snap.val();
+				console.log("message snapshot in factory GET", messages);
+				var messagesArray = _.values(messages);	// convert to array
+        		// console.log("messages in fact", messages);
+				return messagesArray;
+			});
+		  
+		},
+
+		// getMore: function(chatId) {
+			
+		// }
 
 		sendMessage: function(message, chatId) {
 			var messagesRef = refFp.child('messages/' + chatId);
@@ -115,10 +152,6 @@ angular.module('translate.factories', [])
 		},
 
 
-		remove: function(chat) {
-			chats.splice(chats.indexOf(chat), 1);
-		},
-
 		getOtherUser: function(chatId, user) {
 			// console.log("user", user);
 			var chatRef = refFp.child('chats/' + chatId);
@@ -132,19 +165,6 @@ angular.module('translate.factories', [])
 				otherUser = otherUser.toString();
 				return otherUser;
 			});
-		},
-
-
-		get: function(chatId) { // get chat for 
-
-			var messagesRef = refFp.child('messages/' + chatId);
-      		// console.log("messagesRef", messagesRef);
-			return messagesRef.then(function(messagesRef_snap) {
-				var messages = messagesRef_snap.val();
-        		// console.log("messages in fact", messages);
-				return messages;
-			});
-		  
 		},
 
 
@@ -165,15 +185,15 @@ angular.module('translate.factories', [])
 		},
 
 
+
+		remove: function(chat) {
+			chats.splice(chats.indexOf(chat), 1);
+		},
+
+
 	};  // end object
 })
 
-
-.factory('Translate', function ($http) {
-
-	var queryParams;
-
-});
 
 	//   name: 'Ben Sparrow',
 	//   lastText: 'You on your way?',

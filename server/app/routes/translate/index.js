@@ -10,7 +10,6 @@ module.exports = router; // module.exports = function (app){ returns router}	// 
 
 router.get('/', function (req, res) {
     var url = 'https://www.googleapis.com/language/translate/v2';
-    console.log("REQ.QUERY.LANGUAGE", req.query.language);
     if (!req.query.language) req.query.language = 'zh-TW';
     var qs = {
         key: apiKey,
@@ -24,7 +23,7 @@ router.get('/', function (req, res) {
             body = JSON.parse(body);
 
             var translatedMsg = body.data.translations[0].translatedText;
-            console.log("translatedMsg", translatedMsg);
+            // console.log("translatedMsg", translatedMsg);
             return translatedMsg;
         })
 
@@ -34,18 +33,3 @@ router.get('/', function (req, res) {
         .catch(console.error);
 });
 
-
-
-		
-
-	// request( url, function (error, response, body) {
-	// 	if (error) console.log("error", error);
-	// 	console.log("body: ", body);
-
-	// 	body = JSON.parse(body);
-
-	// 	var translatedMsg = body.data.translations[0].translatedText;
-	// 	console.log("translatedMsg", translatedMsg);
-
-	// 	return translatedMsg;
-	// })
