@@ -118,7 +118,7 @@ angular.module('translate.factories', [])
 		},
 
 		// getMore: function(chatId) {
-			
+
 		// }
 
 		sendMessage: function(message, chatId) {
@@ -184,7 +184,20 @@ angular.module('translate.factories', [])
 			});
 		},
 
+		getLanguages: function () {
 
+            queryParams = {
+                language: 'en'
+            };
+
+            return $http.get('/api/translate/languages', {
+                params: queryParams
+            })
+            .then(function (response) {
+                return response.data;
+            });
+
+        },
 
 		remove: function(chat) {
 			chats.splice(chats.indexOf(chat), 1);

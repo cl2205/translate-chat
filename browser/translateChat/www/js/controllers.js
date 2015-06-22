@@ -83,7 +83,7 @@ angular.module('translate.controllers', [])
 	};
 })
 
-.controller('ChatDetailCtrl', function($scope, $stateParams, Chats, $firebaseArray) {
+.controller('ChatDetailCtrl', function($scope, $stateParams, Chats, $ionicModal) {
 	$scope.loggedInUser = "John";
 	
 	Chats.getOtherUser($stateParams.chatId, $scope.loggedInUser).then(function(user) {
@@ -97,21 +97,6 @@ angular.module('translate.controllers', [])
 		// $scope.messages = messages || [];	// messages becomes an object
 		console.log("got scope.messages", $scope.messages);
 	});
-
-
-// scope not updating, only sometimes
-// 	FIREBASE WARNING: Exception was thrown by user callback. TypeError: $scope.messages.push is not a function
-//     at http://localhost:1337/js/controllers.js:79:20
-//     at Fireproof.on.callbackHandler (http://localhost:1337/fireproof/dist/fireproof.js:1502:5)
-//     at h.Ub (https://cdn.firebase.com/js/client/2.2.7/firebase.js:51:375)
-//     at Cb (https://cdn.firebase.com/js/client/2.2.7/firebase.js:46:165)
-//     at yb (https://cdn.firebase.com/js/client/2.2.7/firebase.js:22:216)
-//     at zb (https://cdn.firebase.com/js/client/2.2.7/firebase.js:21:1259)
-//     at Nh.h.Kb (https://cdn.firebase.com/js/client/2.2.7/firebase.js:204:440)
-//     at U.set (https://cdn.firebase.com/js/client/2.2.7/firebase.js:244:165)
-//     at U.push (https://cdn.firebase.com/js/client/2.2.7/firebase.js:250:236)
-//     at Fireproof.push (http://localhost:1337/fireproof/dist/fireproof.js:2220:15) 
-// firebase.js:46 Uncaught TypeError: $scope.messages.push is not a function
 
 	var messagesRef = refFp.child('messages/' + $stateParams.chatId);
 
@@ -159,6 +144,51 @@ angular.module('translate.controllers', [])
 			$scope.liveTranslateView = "";
 		});
 	};
+
+	$scope.setLanguage = function(languageCode) {
+		console.log("set language called");
+		$scope.targetLanguage = languageCode;// selected language from select
+		console.log("$scope targetLanguage", $scope.targetLanguage);
+    };
+
+	$ionicModal.fromTemplateUrl('templates/language-select.html', {
+	    scope: $scope,
+	    animation: 'slide-in-up'
+	  }).then(function(modal) {
+	    $scope.modal = modal;
+	  });
+	  $scope.openModal = function() {
+	    $scope.modal.show();
+	    // get supported languages list
+    	Chats.getLanguages()
+		.then(function(languageList) {
+			console.log("languagelist", languageList);
+			// console.log("a language", languageList[0].name)
+			$scope.list = languageList;	// array of objects { language: zh-CN, name: Chinese }
+		});
+	  };
+	  $scope.closeModal = function() {
+	    $scope.modal.hide();
+	  };
+	  //Cleanup the modal when we're done with it!
+	  $scope.$on('$destroy', function() {
+	    $scope.modal.remove();
+	  });
+	  // Execute action on hide modal
+	  $scope.$on('modal.hidden', function() {
+	    // Execute action
+	  });
+	  // Execute action on remove modal
+	  $scope.$on('modal.removed', function() {
+	    // Execute action
+	  });
+
+})
+
+.controller('LanguageCtrl', function($scope, $ionicSideMenuDelegate) {
+	$scope.toggleLeft = function() {
+		$ionicSideMenuDelegate.toggleLeft();
+    };
 })
 
 .controller('AccountCtrl', function($scope) {

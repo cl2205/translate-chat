@@ -79,6 +79,7 @@ angular.module('translateChat', ['ionic', 'firebase', 'translate.controllers', '
       }
     })
 
+
     // Account Settings View
   .state('tab.account', {
     url: '/account',
@@ -88,7 +89,18 @@ angular.module('translateChat', ['ionic', 'firebase', 'translate.controllers', '
         controller: 'AccountCtrl'
       }
     }
-  });
+  })
+
+      // Language Menu View
+  // .state('language-menu', {
+  //   url: '/select',
+  //   templateUrl: 'templates/language-select.html',
+  //   controller: 'LanguageCtrl'
+  
+  // });
+
+
+
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/tab/chats');

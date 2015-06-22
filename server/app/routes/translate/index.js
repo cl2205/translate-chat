@@ -33,3 +33,26 @@ router.get('/', function (req, res) {
         .catch(console.error);
 });
 
+router.get('/languages', function (req, res, next) {
+
+    var url = 'https://www.googleapis.com/language/translate/v2/languages';
+
+    var qs = {
+        key: apiKey,
+        target: req.query.language
+    };
+
+    requestPromise({ url: url, qs: qs })
+
+        .then(function(body) {
+            body = JSON.parse(body);
+            var languagesArr = body.data.languages;
+            return languagesArr;
+        })
+
+        .then(function(languageList) {
+            res.send(languageList);
+        })
+        .catch(console.error);
+});
+

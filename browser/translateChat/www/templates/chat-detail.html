@@ -5,8 +5,17 @@
   The Friends service returns an array of friend data
 -->
 
+
 <ion-view view-title="{{chat.name}}">
-  <ion-content class="padding">
+
+  <ion-nav-buttons side="secondary">
+      <button class="button" ng-click="openModal()">
+        Edit Target Language
+      </button>
+  </ion-nav-buttons>
+
+
+  <ion-content overflow-scroll="true" class="padding">
     <ion-list>
       <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="message in messages" type="item-text-wrap" style="padding-left: 10px">
 <!--         <h2>{{ message.from }}</h2> -->
