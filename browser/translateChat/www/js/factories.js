@@ -12,8 +12,8 @@ angular.module('translate.factories', [])
 
 	    "John": { source_language: "en", contacts: { Obama: true, Fullstack: true, Kelly: true }, chats: [ "chat1", "chat2", "chat3" ], phoneNumber: +16467831204 },
 	    "Kelly": { source_language: "zh-TW", contacts: { John: true, Obama: true, Fullstack: true }, chats: { chat1: true }, phoneNumber: +13236329813 },
-	    "Obama": { source_language: "en", contacts: { John: true, Fullstack: true, Kelly: true }, chats: { chat2: true, chat4: true }, phoneNumber: +19172542078 },
-	    "Fullstack": { source_language: "fr", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat3: true, chat4: true }, phoneNumber: +19172542078 }
+	    "Obama": { source_language: "en", contacts: { John: true, Fullstack: true, Kelly: true }, chats: { chat2: true, chat4: true } },
+	    "Fullstack": { source_language: "fr", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat3: true, chat4: true } }
 	};
 
 	var chats = {
@@ -40,13 +40,22 @@ angular.module('translate.factories', [])
 	var messagesRefFb = ref.child('messages');
   	var chatsRefFb = ref.child('chats');
   	var usersRefFb = ref.child('users');
-  	usersRefFb.set(users);
-  	chatsRefFb.set(chats);
-	messagesRefFb.set(messages);
+ //  	usersRefFb.set(users);
+ //  	chatsRefFb.set(chats);
+	// messagesRefFb.set(messages);
 	// Might use a resource here that returns a JSON array
 	// var chatList = $firebase(ref.child('chats')).$asArray();
 
 	return {
+
+		// getChatRefs: function(user) {
+		// 	var usersChats = refFp.child('/users/' + user + '/chats');
+		// 	return usersChats.then(function(chatList_snapshot) {  // array of chatIds
+		// 		var chatIdArray = chatList_snapshot.val();
+		// 		console.log("Chat refs array", chatIdArray);
+		// 		return chatIdArray;
+		// 	})
+		// },
 
 		all: function(user) {
 
@@ -54,18 +63,21 @@ angular.module('translate.factories', [])
 
 		return usersChats.then(function(chatList_snapshot) {  // array of chatIds
 				var chatIdArray = chatList_snapshot.val();
+				console.log("Chat id array", chatIdArray);
 				return chatIdArray;
 			})
 
-			.then(function(chatIdArray) {
+			.then(function(chatIdArray) {	// get reference (chatId) to eat chat in list
 				var chatListRefs = chatIdArray.map(function(chatId) {
 					var singleChatRef = refFp.child('/chats/' + chatId);
+					singleChatRef.uid = chatId;
+					console.log("singleChatRef", singleChatRef.uid);
 					return singleChatRef;
 				});
 				return chatListRefs;
 			})
 
-			.then(function(chatListRefs) {
+			.then(function(chatListRefs) {	// get snapshot values of each chat and make that the chatlist to return
 					var chatList = Promise.all(chatListRefs.map(function(singleChatRef) {
 						return singleChatRef.then(function(singleChat_snap) {
 							// console.log(singleChat_snap.val());
@@ -124,25 +136,48 @@ angular.module('translate.factories', [])
 		sendMessage: function(message, chatId) {
 			var messagesRef = refFp.child('messages/' + chatId);
 
-			messagesRef.push(message).then(function() {
-				// console.log("saved sent Message");
-			});
+			var newMessageRef = messagesRef.push(message);
 
+			// create new msg, update with message ID
+			var newMessageId = newMessageRef.key();
+			var createdMsgRef = refFp.child('messages/' + newMessageId);
+			createdMsgRef.update({ "id": newMessageId });
+			console.log("saved sent Message, assigned new id");
 
-			var userRef = refFp.child('users/' + message.to);
+			
+			// find user, then get user's phone #
+			var usersRef = refFp.child('users');
+			return usersRef.then(function(users_snap) {
+				var users = users_snap.val();
+				console.log("user list", users);
+				console.log("message.to", message.to);
+				console.log("type of message.to", typeof message.to);
+				message.to = Number(message.to);
+				var foundUserId = _.pluck(_.where(users, { 'phoneNumber' : message.to }), 'id');
+				// var foundUser = _.pluck(_.where(users, { 'phoneNumber': message.to }, );
+				
+				foundUserId = foundUserId.toString();
+				console.log("found userId: ", foundUserId);
+				var userRef = refFp.child('users/' + foundUserId);
+				// var userRef = refFp.child('users/' + message.to);
+				console.log("message.to", message.to);
+				console.log("type of message.to", typeof message.to)
 
-			return userRef.then(function(user_snap) {
-				var recipient = user_snap.val();
-				// console.log("recipient to sent msg", recipient);
-				return recipient.phoneNumber;
-			})
-			.then(function(recipientPhone) {
+				// console.log("user snapshot", user_snap);
+				return userRef.then(function(user_snap) {
+					var recipient = user_snap.val();
+					console.log("recipient to sent msg", recipient);
+					return recipient.phoneNumber;
+				})
+
+				// send message (tranlate and send)
+
+			}).then(function(recipientPhone) {
 				// console.log('recipientPhone', recipientPhone);
 				var messageData = {
 					phone: recipientPhone,
 					message: message.translated
 				};
-
 
 				return $http.post('/api/sms/sendmsg', messageData).then(function(sentMsg) {
 				// console.log("sentMsg", sentMsg);
@@ -155,12 +190,14 @@ angular.module('translate.factories', [])
 		getOtherUser: function(chatId, user) {
 			// console.log("user", user);
 			var chatRef = refFp.child('chats/' + chatId);
+			console.log("findnig other user");
 			return chatRef.then(function(chatRef_snap) {
 				var chat = chatRef_snap.val();
 				// console.log("chat", chat);
 				var otherUser = _.filter(chat.members, function(member) {
 					return member !== user;
 				});
+				console.log("otherUser", otherUser);
 				// console.log("otherUser", otherUser);
 				otherUser = otherUser.toString();
 				return otherUser;

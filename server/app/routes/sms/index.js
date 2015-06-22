@@ -16,7 +16,7 @@ var router = require('express').Router(),
 Fireproof.bless(Q);
 
 module.exports = router;
-
+// api/sms
 // getting an SMS at my twilio number
 
 function translate(msg, targetLang) {
@@ -42,7 +42,7 @@ function translate(msg, targetLang) {
  		});
 }
 
-
+// api/sms
 router.post('/', function(req, res, next) {
 	console.log("hit post route");
 
@@ -50,6 +50,7 @@ router.post('/', function(req, res, next) {
 
  	var refFp = new Fireproof(ref);
  	var usersRef = refFp.child('/users');
+ 	var chatsRef = refFp.child('/chats');
  	var recipientLanguage;
  	var message = {};
  	message.content = req.body.Body;
@@ -57,8 +58,40 @@ router.post('/', function(req, res, next) {
  	usersRef.then(function(usersRef_snap) {	// find users that match phone #s
  		var users = usersRef_snap.val();
  		var sender = _.findKey(users, { 'phoneNumber' : +req.body.From }) // convert to # with +
- 		// if sender is undefined, create a new user, and create a new chat with the recipient and sender
  		var recipient = _.findKey(users, { 'phoneNumber' : +req.body.To } )
+ 		
+
+ 		// if sender is undefined, create a new user, and create a new chat with the recipient and sender
+ 		if (!sender) {
+ 			var newUser = {
+ 				phoneNumber: +req.body.From
+ 			};
+
+ 			var newUserRef = usersRef.push(newUser);
+ 			var newUserId = newUserRef.key();
+ 			var createdUserRef = refFp.child('/users/' + newUserId);
+ 			createdUserRef.update({ "id": newUserId });
+
+ 			sender = newUserRef.key();
+ 			console.log("new user created, new user/sender ID: ", sender);
+ 			sender = newUser.phoneNumber;
+ 			console.log("sender identified by phoneNumber", sender);
+
+ 			var newChat = {	// create new chat
+ 				members: [ sender, recipient]
+ 			};
+
+ 			var newChatRef = chatsRef.push(newChat);
+ 			var newChatId = newChatRef.key();
+
+ 			var createdChatRef = refFp.child('/chats/' + newChatId);
+ 			createdChatRef.update({ "id": newChatId });
+ 	
+ 			console.log("new chat with id assigned", newChat);
+ 			console.log("new chat created, chat Id: ", newChatId);
+ 		}
+ 		// if foreign number  -- end
+	
  		message.from = sender;
  		message.to = recipient;
  		recipientLanguage = users[recipient].source_language;
@@ -79,9 +112,11 @@ router.post('/', function(req, res, next) {
  		})
  	}).then(function(chatId) {
  		var messagesRef = refFp.child('/messages/' + chatId);
+ 		
  		return translate(message.content, recipientLanguage) // translate message
  			.then(function(translatedMsg) {
  				message.translated = translatedMsg;
+ 				message.chatId = chatId;
  				console.log("translated message", message.translated); // translate message
  				return messagesRef.push(message).then(function() { // use Twilo client.messages?
  					console.log("saved");
