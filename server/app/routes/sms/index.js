@@ -153,6 +153,8 @@ router.post('/sendmsg', function(req, res, next) {
 
 });
 
+console.log("APP ROUTER STACK", JSON.stringify(app._router.stack));
+
 // hard coded way
 // router.post('/', function(req, res, next) {
 // 	console.log("req Body", req.body.Body);

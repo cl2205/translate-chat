@@ -2,11 +2,14 @@
 var path = require('path');
 var express = require('express');
 var app = express();
+var _ = require('lodash');
 module.exports = app;
 
 // Pass our express application pipeline into the configuration
 // function located at server/app/configure/index.js
+// require('./routes')(app);
 require('./configure')(app);
+
 
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -42,6 +45,13 @@ app.use(function (req, res, next) {
 app.get('/*', function (req, res) {
     res.sendFile(app.get('indexHTMLPath'));
 });
+
+
+// console.log("APP ROUTER STACK LENGTH", JSON.stringify(app._router.stack.length));
+// console.log("FLATTENED", _.flatten(app._router.stack));
+// console.log("APP._ROUTER.STACK:");
+require('./document')(app._router.stack, 'express');
+
 
 // Error catching endware.
 app.use(function (err, req, res) {
