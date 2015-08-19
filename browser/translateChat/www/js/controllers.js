@@ -7,8 +7,6 @@ angular.module('translate.controllers', [])
 
 .controller('LoginCtrl', function($scope) {
 
-	console.log('Login Controller initialized');
-
 	$scope.signIn = function() {
 		$state.go('tab.chats');
 	};
@@ -33,15 +31,13 @@ angular.module('translate.controllers', [])
 	$scope.targetLanguage;
 
 	$scope.$watchCollection('chats', function(newChats, oldChats) {
-		console.log("updating chats");
-		console.log("newChats", newChats);
-		console.log("oldChats", oldChats);
-			$scope.chats = newChats; // show live view
+
+		$scope.chats = newChats; // show live view
 
 	});
 
 	Chats.all($scope.loggedInUser).then(function(chatList) {
-		console.log("getting all chats..");
+
 		chatList.forEach(function(chat) {
 			chat.members = _.filter(chat.members, function(member) {
 				return member !== $scope.loggedInUser;
@@ -53,13 +49,13 @@ angular.module('translate.controllers', [])
 	}).then(function(chatList) {
 
 		chatList = Promise.all(chatList.map(function(chat) {
-			console.log("chatid", chat.id);
+
 			return Chats.getLastTextOfChat(chat.id).then(function(lastText) {
-				console.log("getting last text..");
+
 				if (lastText) {
 					// chat.lastText = lastText.content;
 					chat.lastText = lastText;
-					console.log("chat", chat.lastText);
+	
 					return chat;
 				} else {
 					chat.lastText = "no messages available.";
@@ -70,14 +66,8 @@ angular.module('translate.controllers', [])
 
 		return chatList;
 	}).then(function(arrayOfChats) {
-		console.log("arrayOfChats", arrayOfChats);
 		$scope.chats = arrayOfChats; 
-		console.log("modified chats to show on scope", $scope.chats);
 	});	
-
-		// console.log("modified chatlist", chatList);
-		// $scope.chats = chatList; 
-
 
 
 	$scope.remove = function(chat) {
@@ -93,24 +83,19 @@ angular.module('translate.controllers', [])
 	});
 	// get chat
 	Chats.get($stateParams.chatId).then(function(messages){
-		console.log("messages received are array", messages);
-		// $scope.messages.push(messages);
+		
 		$scope.messages = messages;
-		// $scope.messages = messages || [];	// messages becomes an object
-		console.log("got scope.messages", $scope.messages);
+		
 	});
 
 	var messagesRef = refFp.child('messages/' + $stateParams.chatId);
 
 	messagesRef.on("child_added", function(snapshot, prevChildKey) {
 		var newMessage = snapshot.val();
-		console.log("newMessage: ", newMessage);
-		console.log("$scope.messages is an array", Array.isArray($scope.messages), $scope.messages);
+	
 		if ($scope.messages) {
 			$scope.messages.push(newMessage);
-			console.log("pushed");
 			_.defer(function(){
-				console.log("apply called");
 				$scope.$apply();
 			});
 		}
@@ -148,9 +133,8 @@ angular.module('translate.controllers', [])
 	};
 
 	$scope.setLanguage = function(languageCode) {
-		console.log("set language called");
+
 		$scope.targetLanguage = languageCode;// selected language from select
-		console.log("$scope targetLanguage", $scope.targetLanguage);
 		$scope.closeModal();
     };
 
@@ -207,13 +191,10 @@ angular.module('translate.controllers', [])
 	  });
 
 	  $scope.openModal = function() {
-	  	console.log("open modal");
 	    $scope.modal.show();
-	    console.log("open modal");
 	    // get supported languages list
     	Chats.getLanguages()
 		.then(function(languageList) {
-			console.log("got language list");
 			$scope.list = languageList;	// array of objects { language: zh-CN, name: Chinese }
 		});
 	  };
@@ -224,13 +205,10 @@ angular.module('translate.controllers', [])
 
 	  // set source language
 	  $scope.setLanguage = function(languageCode) {
-		console.log("set language called");
-		console.log("logged in user", $scope.loggedInUser);
 		$scope.sourceLanguage = languageCode;// selected language from select
-		console.log("$scope sourceLanguage", $scope.sourceLanguage);
+	
 		Chats.setSourceLanguage($scope.loggedInUser, languageCode)
 		.then(function() {
-			console.log("source language updated");
 			$scope.closeModal();
 		}).catch(function(err) {
 			console.log(err);

@@ -62,19 +62,17 @@ router.post('/', function(req, res, next) {
  		message.from = sender;
  		message.to = recipient;
  		recipientLanguage = users[recipient].source_language;
- 		console.log("recipientLanguage", recipientLanguage);
- 		console.log("sender", sender);
- 		console.log("recipient", recipient);
+ 	
  		var chatMembers = [ sender, recipient ];
- 		console.log("chatMembers", chatMembers);
+ 	
  		return chatMembers;
  	}).then(function(chatMembers) {	// find chats where members contain those users
  		var chatsRef = refFp.child('/chats');
  		return chatsRef.then(function(chats_snap){
  			var chats = chats_snap.val();
- 			console.log('chats', chats);
+ 			
  			var chatId = _.findKey(chats, { members: [ chatMembers[0], chatMembers[1] ] });
- 			console.log("found chatId", chatId);
+ 
  			return chatId;
  		})
  	}).then(function(chatId) {
@@ -82,17 +80,15 @@ router.post('/', function(req, res, next) {
  		return translate(message.content, recipientLanguage) // translate message
  			.then(function(translatedMsg) {
  				message.translated = translatedMsg;
- 				console.log("translated message", message.translated); // translate message
+ 
  				return messagesRef.push(message).then(function() { // use Twilo client.messages?
- 					console.log("saved");
+ 
  				})
  		});	
  	}).catch(function(err) {
  		console.log(err.message);
  	});
 });
- 	// var messagesRef = refFp.child('/messages');
-
 
 
 // api/sms/sendmsg
@@ -118,47 +114,3 @@ router.post('/sendmsg', function(req, res, next) {
 
 });
 
-// hard coded way
-// router.post('/', function(req, res, next) {
-// 	console.log("req Body", req.body.Body);
-// 	console.log("req.From", req.body.From)
-// 	console.log("hit route");
-
-//  	var message = {
-//  		from: 'Kelly',
-// 		content: req.body.Body,
-// 		to: 'John'
-//  	}
-
-//  	var ref = new Firebase("https://fiery-torch-3361.firebaseio.com");
-
-//  	var refFp = new Fireproof(ref);
-
-//  	// var usersRef = refFp.child('/users');
-//  	var userRef = refFp.child('/users/John');
-//  	var messagesRef = refFp.child('/messages/chat1');
-
-//  	var url = 'https://www.googleapis.com/language/translate/v2';
- 
-//     if (!req.query.language) req.query.language = 'en';
-//     var qs = {
-//         key: translateApiKey,
-//         target: req.query.language,
-//         q: req.body.Body,
-//     };
-
-//     requestPromise({ url: url, qs: qs })
-//         .then(function(body) {
-//             body = JSON.parse(body);
-//             var translatedMsg = body.data.translations[0].translatedText;
-//             console.log("translatedMsg", translatedMsg);
-//             return translatedMsg;
-//         })
-//         .then(function(translatedMsg) {
-//            	message.translated = translatedMsg;
-//            	messagesRef.push(message).then(function() { // use Twilo client.messages?
-//  			console.log("saved");
-//  			});
-//         })
-//         .catch(console.error);
-//  });

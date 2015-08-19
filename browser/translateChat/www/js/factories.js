@@ -1,13 +1,8 @@
 angular.module('translate.factories', [])
 
-// .factory('Auth', function ($firebaseAuth, $rootScope) {
-//   //set global variable reference to our Firebase on $rootScope to make it available to every $scope 
-//   var ref = new Firebase("https://fiery-torch-3361.firebaseio.com");
-//   console.log("ref", ref);
-//   return $firebaseAuth(ref);
-// })
 
 .factory('Chats', function ($rootScope, $http, $q) {
+	// seed users and chats
 	var users = {
 
 	    "John": { source_language: "en", contacts: { Obama: true, Fullstack: true, Kelly: true }, chats: [ "chat1", "chat2", "chat3" ], phoneNumber: +16467831204 },
@@ -68,11 +63,11 @@ angular.module('translate.factories', [])
 			.then(function(chatListRefs) {
 					var chatList = Promise.all(chatListRefs.map(function(singleChatRef) {
 						return singleChatRef.then(function(singleChat_snap) {
-							// console.log(singleChat_snap.val());
+
 							return singleChat_snap.val();
 						})
 					}))
-					// console.log("chatList", chatList);
+
 					return chatList;
 			})
 
@@ -85,41 +80,32 @@ angular.module('translate.factories', [])
 		getLastTextOfChat: function(chatId) {
 			var messagesRef = refFp.child('/messages/' + chatId);
 			return messagesRef.limitToLast(1).then(function(messages_snap) {
-				console.log("last text snapshot", messages_snap.val());
 		
 				var lastText = messages_snap.val();
 				if (!lastText) {
-					console.log("if last text snap is undefined, should go here");
 					return "No messages available.";
 				} else {
-					console.log("lasttext1", lastText["1"]);
-					console.log("lasttext for 3rd", lastText[0]);
+				
 					var content = _.pluck(lastText, 'content').toString();
-					console.log("will this work?", content);
-					// return lastText["1"];
 					return content;
 				}
 			})
 		},
 
 
-		get: function(chatId) { // get chat for 
+		get: function(chatId) { 
 
 			var messagesRef = refFp.child('messages/' + chatId);
-      		// console.log("messagesRef", messagesRef);
+ 
 			return messagesRef.limitToLast(5).then(function(messagesRef_snap) {
 				var messages = messagesRef_snap.val();
-				console.log("message snapshot in factory GET", messages);
 				var messagesArray = _.values(messages);	// convert to array
-        		// console.log("messages in fact", messages);
+     
 				return messagesArray;
 			});
 		  
 		},
 
-		// getMore: function(chatId) {
-
-		// }
 
 		sendMessage: function(message, chatId) {
 			var messagesRef = refFp.child('messages/' + chatId);
@@ -133,19 +119,16 @@ angular.module('translate.factories', [])
 
 			return userRef.then(function(user_snap) {
 				var recipient = user_snap.val();
-				// console.log("recipient to sent msg", recipient);
 				return recipient.phoneNumber;
 			})
 			.then(function(recipientPhone) {
-				// console.log('recipientPhone', recipientPhone);
 				var messageData = {
 					phone: recipientPhone,
 					message: message.translated
 				};
 
-
 				return $http.post('/api/sms/sendmsg', messageData).then(function(sentMsg) {
-				// console.log("sentMsg", sentMsg);
+
 				});
 			});
 	
@@ -153,21 +136,17 @@ angular.module('translate.factories', [])
 
 
 		getOtherUser: function(chatId, user) {
-			// console.log("user", user);
 			var chatRef = refFp.child('chats/' + chatId);
 			return chatRef.then(function(chatRef_snap) {
 				var chat = chatRef_snap.val();
-				// console.log("chat", chat);
 				var otherUser = _.filter(chat.members, function(member) {
 					return member !== user;
 				});
-				// console.log("otherUser", otherUser);
+
 				otherUser = otherUser.toString();
 				return otherUser;
 			});
 		},
-
-
 
 		translateWhileTyping: function(text, targetLanguage) {
 			var queryParams = {
@@ -175,7 +154,7 @@ angular.module('translate.factories', [])
 				text: text
 			};
 		
-			return $http.get('/api/translate', {    // SERVER ROUTE
+			return $http.get('/api/translate', {
 				params: queryParams
 			})
 
@@ -200,15 +179,12 @@ angular.module('translate.factories', [])
         },
 
         setSourceLanguage: function(user, languageCode) {
-        	console.log("user:", user);
-        	console.log("languageCode", languageCode);
-        	console.log("set source language");
+    
         	var userRef = refFp.child('/users/' + user);
 
         	return userRef.update({
         		"source_language": languageCode
         	}).then(function() {
-        		console.log("user with updated sourcelang");
         		return;
         	}).catch(function(err) {
         		console.log("Updated source language could not be saved: " + err);
@@ -217,34 +193,15 @@ angular.module('translate.factories', [])
 
 		remove: function(chat) {
 			chats.splice(chats.indexOf(chat), 1);
-		},
+		}
 
 
 	};  // end object
 })
 
 
-	//   name: 'Ben Sparrow',
-	//   lastText: 'You on your way?',
-	//   face: 'https://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png'
-	// }, {
-	//   id: 1,
-	//   name: 'Max Lynx',
-	//   lastText: 'Hey, it\'s me',
-	//   face: 'https://avatars3.githubusercontent.com/u/11214?v=3&s=460'
-	// },{
-	//   id: 2,
-	//   name: 'Adam Bradleyson',
-	//   lastText: 'I should buy a boat',
-	//   face: 'https://pbs.twimg.com/profile_images/479090794058379264/84TKj_qa.jpeg'
-	// }, {
-	//   id: 3,
-	//   name: 'Perry Governor',
-	//   lastText: 'Look at my mukluks!',
-	//   face: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-	// }, {
-	//   id: 4,
-	//   name: 'Mike Harrington',
-	//   lastText: 'This is wicked good ice cream.',
-	//   face: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-	// }];
+// .factory('Auth', function ($firebaseAuth, $rootScope) {
+//   //set global variable reference to our Firebase on $rootScope to make it available to every $scope 
+//   var ref = new Firebase("https://fiery-torch-3361.firebaseio.com");
+//   return $firebaseAuth(ref);
+// })
