@@ -10,4 +10,4 @@ Features
 Technologies
 
 - Integrates Ionic framework, Twilio, and Node/Express server to programmatically send and receive translated text messages
-- Uses Firebase for real-time data storage/syncing  and Google Translate API to support real-time translations between 90 languages
+- Uses Firebase for real-time data storage/syncing  and Google Translate API to support translations between 90 languages
