@@ -3,7 +3,7 @@ var router = require('express').Router();
 module.exports = router;
 
 router.use('/sms', require('./sms'));
-router.use('/members', require('./members'));
+router.use('/translate', require('./translate'));
 
 
 // router.get('/', function(req, res, next) {

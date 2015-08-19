@@ -6,10 +6,12 @@ var apiKey = app.getValue('env').TRANSLATE.apiKey;
 
 module.exports = router; // module.exports = function (app){ returns router}	// passing app into function
 
+//api/translate
 
 router.get('/', function (req, res) {
     var url = 'https://www.googleapis.com/language/translate/v2';
-    console.log("REQ.QUERY.LANGUAGE", req.query.language);
+
+    
     if (!req.query.language) req.query.language = 'zh-TW';
     var qs = {
         key: apiKey,
@@ -23,7 +25,7 @@ router.get('/', function (req, res) {
             body = JSON.parse(body);
 
             var translatedMsg = body.data.translations[0].translatedText;
-            console.log("translatedMsg", translatedMsg);
+            // console.log("translatedMsg", translatedMsg);
             return translatedMsg;
         })
 
@@ -33,18 +35,26 @@ router.get('/', function (req, res) {
         .catch(console.error);
 });
 
+router.get('/languages', function (req, res, next) {
 
+    var url = 'https://www.googleapis.com/language/translate/v2/languages';
 
-		
+    var qs = {
+        key: apiKey,
+        target: req.query.language
+    };
 
-	// request( url, function (error, response, body) {
-	// 	if (error) console.log("error", error);
-	// 	console.log("body: ", body);
+    requestPromise({ url: url, qs: qs })
 
-	// 	body = JSON.parse(body);
+        .then(function(body) {
+            body = JSON.parse(body);
+            var languagesArr = body.data.languages;
+            return languagesArr;
+        })
 
-	// 	var translatedMsg = body.data.translations[0].translatedText;
-	// 	console.log("translatedMsg", translatedMsg);
+        .then(function(languageList) {
+            res.send(languageList);
+        })
+        .catch(console.error);
+});
 
-	// 	return translatedMsg;
-	// })

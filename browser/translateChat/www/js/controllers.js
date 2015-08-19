@@ -1,3 +1,8 @@
+//Synchronous XMLHttpRequest on the main thread is deprecated because of its detrimental effects to the end user's experience. For more help, check http://xhr.spec.whatwg.org/.
+// when I try to send a message from app and there are already previous messages add, doesn't treat $scope.messages as an array. Is it because of how I set my data?
+
+// where there is already a message I added to scope.messages, and then i try to add another message, won't work. because it says I can't push on an object.
+// the controller won't update when I hit the back button.
 angular.module('translate.controllers', [])
 
 .controller('LoginCtrl', function($scope) {
@@ -10,198 +15,227 @@ angular.module('translate.controllers', [])
 
 })
 
-.controller('DashCtrl', function($scope) {})
+.controller('DashCtrl', function($scope) {
+	
+})
 
-.controller('ChatsCtrl', function($scope, Chats, $rootScope, $firebaseArray) {
+.controller('ChatsCtrl', function($scope, Chats, $rootScope, $firebaseArray, $stateParams, $state) {
 	// With the new view caching in Ionic, Controllers are only called
 	// when they are recreated or on app start, instead of every page change.
 	// To listen for when this page is active (for example, to refresh data),
 	// listen for the $ionicView.enter event:
 	//
 	$scope.$on('$ionicView.enter', function(e) {
+		console.log("this page is active");
 	});
 
-	var ref = new Firebase("https://fiery-torch-3361.firebaseio.com");
-	  chatsRef = ref.child('chats');
-	  usersRef = ref.child('users');
-	  messagesRef = ref.child('messages');
-
-	var users = {
-
-	    "John": { source_language: "en", contacts: { Obama: true, Fullstack: true, Kelly: true }, chats: [ "chat1", "chat2", "chat3" ], phoneNumber: 9172542078 },
-	    "Obama": { source_language: "en", contacts: { John: true, Fullstack: true, Kelly: true }, chats: { chat2: true, chat4: true }, phoneNumber: 9172542078 },
-	    "Fullstack": { source_language: "fr", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat3: true, chat4: true }, phoneNumber: 9172542078 },
-	    "Kelly": { source_language: "zh-TW", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat1: true } }
-	};
-
-	var chats = {
-	    "chat1": { id: 1, members: [ "John", "Kelly"], lastText: "Where are you?"},
-	    "chat2": { id: 2, members: [ "John", "Obama" ], lastText: "I'm so pumped!!!" },
-	    "chat3": { id: 3, members: [ "John", "Fullstack"], lastText: "I have big news for you..." },
-	    "chat4": { id: 4, members: ["Fullstack", "Obama"], lastText: "I have a big news..." }
-	};
-
-
-	usersRef.set(users);  
-	chatsRef.set(chats);
-
 	$scope.loggedInUser = "John";
-	$scope.targetLanguage = "zh-TW";
-	// $scope.chats = Chats.all($scope.loggedInUser);
+	$scope.targetLanguage;
+
+	$scope.$watchCollection('chats', function(newChats, oldChats) {
+		console.log("updating chats");
+		console.log("newChats", newChats);
+		console.log("oldChats", oldChats);
+			$scope.chats = newChats; // show live view
+
+	});
+
+	Chats.all($scope.loggedInUser).then(function(chatList) {
+		console.log("getting all chats..");
+		chatList.forEach(function(chat) {
+			chat.members = _.filter(chat.members, function(member) {
+				return member !== $scope.loggedInUser;
+			})
+		});
+
+		return chatList;
+
+	}).then(function(chatList) {
+
+		chatList = Promise.all(chatList.map(function(chat) {
+			console.log("chatid", chat.id);
+			return Chats.getLastTextOfChat(chat.id).then(function(lastText) {
+				console.log("getting last text..");
+				if (lastText) {
+					// chat.lastText = lastText.content;
+					chat.lastText = lastText;
+					console.log("chat", chat.lastText);
+					return chat;
+				} else {
+					chat.lastText = "no messages available.";
+					return chat;
+				}
+			})
+		}));
+
+		return chatList;
+	}).then(function(arrayOfChats) {
+		console.log("arrayOfChats", arrayOfChats);
+		$scope.chats = arrayOfChats; 
+		console.log("modified chats to show on scope", $scope.chats);
+	});	
+
+		// console.log("modified chatlist", chatList);
+		// $scope.chats = chatList; 
 
 
-	// $scope.all = function(user) {
-	//       var chatList = ref.child('chats');
-	//       var userChats;
-	//       chatList.once('value', function(snapshot) {
-	//         var chatSnapshot = snapshot.val();
-	//         console.log("snapshot", chatSnapshot);
-	//         usersChats = _.where(chatSnapshot, { members: { john: true } });
-	//         console.log("usersChats", usersChats);
-	//         $scope.chats = userChats;
-	//       });
-	      
-	// 	};
-
-	// var johnsChats = ref.child('users/' + $scope.loggedInUser + '/chats' )
-	$scope.chatList = [];
-
-	// _.pluck(_.where(usersChats, { 'john': 36, 'active': false }), 'user');
-	// var usersChats = $firebaseArray(ref.child('users/' + $scope.loggedInUser + '/chats'));
-	// console.log("usersChats", usersChats);
-	// console.log("foreach");
-	// usersChats.forEach(function(chatId) {
-	// 	console.log("chatId", chatId);
-	// 	var members = $firebaseArray(ref.child('chats/' + chatId + '/members'));
-	// 	members.forEach(function(member) {
-	// 		console.log("member", member);
-	// 		if (member !== $scope.loggedInUser) {
-
-	// 			$scope.chattingWith = member;
-	// 			console.log("scope.chattingiwth", $scope.chattingWith);
-	// 		}
-	// 	});
-	// });
-	var usersChats = ref.child('/users/' + $scope.loggedInUser + '/chats');
-
-    usersChats.once('value', function(chatId_snapshot) {	// array of chatIds
-    	var chatIdArray = chatId_snapshot.val();
-  
-    	chatIdArray.forEach(function(chatId) { // for each chatId
-    		var otherUser;
-    		$scope.chat = ref.child('chats/' + chatId);
-
-    		var oneChat = ref.child('/chats/' + chatId);
-    		oneChat.once('value', function(snap) {
-    			console.log("snapval", snap.val());
-    			var oneChatObj = snap.val();
-    			oneChatObj.lastText
-    			oneChatObj.members.forEach(function(member) {
-    				if (member !== $scope.loggedInUser) {
-    					otherUser = member;
-    				}
-    			})
-    			$scope.chatList.push({ chattingWith: otherUser, lastText: oneChatObj.lastText});
-    		});
-
-    		// var chats = ref.child('chats/' + chatId + '/members'); // check that chat's members
-    		// chats.once('value', function(members_snap) { // array of members
-    		// 	var members = members_snap.val();
-    	
-    		// 	members.forEach(function(member) {	// for each member
-    				
-    		// 		if (member !== $scope.loggedInUser) {
-    					
-    		// 			$scope.chatList.push(member);
-    				
-    		// 		};
-
-    		// 	});
-    		// })
-    	})
-    })
-
-	// chatList.once('value', function(snapshot) {
- //        var chatSnapshot = snapshot.val();	// array of chats
-
- //        })
-
- //        if (snapshot.val() !== null) {
- //        	usersChats.push()
- //        }
-
- //        if ()
- //        console.log("snapshot", chatSnapshot);
- //        usersChats = _.where(chatSnapshot, { members: { john: true } });
- //        console.log("usersChats", usersChats);
-	  
-	//     $scope.chats = usersChats;
-
-
-	//     for (var i = 0; i <  usersChats.length; i++) {
-	//     	var keys = _.keys(usersChats[i].members); // get keys of each chat's members object
-	//     	var recipient = _.remove(keys, function(name) {
- //        		return name !== "john";
- //        	});
-	//     	console.log("recipient", recipient);
- //        	$scope.recipient = recipient;
-	//     }
-        	
-        // $scope.recipient = recipient;
-        
-       
-
-	// });
-
-	// $scope.all($scope.loggedInUser);
-	// console.log("SCOPE.CHATS", $scope.chats);
 
 	$scope.remove = function(chat) {
 		Chats.remove(chat);
 	};
 })
 
-.controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
-	// get chat
-	$scope.chat = Chats.get($stateParams.chatId);
+.controller('ChatDetailCtrl', function($scope, $stateParams, Chats, $ionicModal) {
+	$scope.loggedInUser = "John";
 	
-	// $scope.messages
+	Chats.getOtherUser($stateParams.chatId, $scope.loggedInUser).then(function(user) {
+		$scope.otherUser = user;
+	});
+	// get chat
+	Chats.get($stateParams.chatId).then(function(messages){
+		console.log("messages received are array", messages);
+		// $scope.messages.push(messages);
+		$scope.messages = messages;
+		// $scope.messages = messages || [];	// messages becomes an object
+		console.log("got scope.messages", $scope.messages);
+	});
 
-	console.log("input field", $scope.input);
-	console.log("liveTranslate view", $scope.liveTranslateView);
+	var messagesRef = refFp.child('messages/' + $stateParams.chatId);
+
+	messagesRef.on("child_added", function(snapshot, prevChildKey) {
+		var newMessage = snapshot.val();
+		console.log("newMessage: ", newMessage);
+		console.log("$scope.messages is an array", Array.isArray($scope.messages), $scope.messages);
+		if ($scope.messages) {
+			$scope.messages.push(newMessage);
+			console.log("pushed");
+			_.defer(function(){
+				console.log("apply called");
+				$scope.$apply();
+			});
+		}
+	});
+
 	// on user input, translate text
-	$scope.$watch('input', function(oldText, newText) {
+	$scope.$watch('input', function(newText, oldText) {
 
-		Chats.translateWhileTyping(newText, $scope.targetLanguage)
+		if (oldText) {
+			Chats.translateWhileTyping(newText, $scope.targetLanguage)
 			.then(function(translatedText) {
 				$scope.liveTranslateView = translatedText; // show live view
 			})
 			.catch(function(err) {
 				console.log(err.message);
 			});
+		}
 	});
 
-	// $scope.submitMessage = Chats.submitMessage()
+	$scope.submitMessage = function() {
+		// console.log("chattingwithuser", $scope.otherUser);
+		$scope.loggedInUser = "John";
+		var message = {
+			content: $scope.input,
+			from: $scope.loggedInUser,
+			to: $scope.otherUser,
+			translated: $scope.liveTranslateView
+		};
 
-	// .then(function() {
-	// 	// calling $add on a synchronized array is like Array.push(),
-	// 			// except that it saves the changes to our Firebase database!
-	// 	$scope.messages.$add({
-	// 		from: $scope.user,
-	// 		content: $scope.input,
-	// 		translatedContent: $scope.liveTranslateView
-	// 	});
-	// })
+		Chats.sendMessage(message, $stateParams.chatId)
+		.then(function() {
+			$scope.input = "";
+			$scope.liveTranslateView = "";
+		});
+	};
 
-	// .then(function() {
-	// 	$scope.input = ""; // clear the input field
-	// });
+	$scope.setLanguage = function(languageCode) {
+		console.log("set language called");
+		$scope.targetLanguage = languageCode;// selected language from select
+		console.log("$scope targetLanguage", $scope.targetLanguage);
+		$scope.closeModal();
+    };
 
+	$ionicModal.fromTemplateUrl('templates/language-select.html', {
+	    scope: $scope,
+	    animation: 'slide-in-up'
+	  }).then(function(modal) {
+	    $scope.modal = modal;
+	  });
+	  $scope.openModal = function() {
+	    $scope.modal.show();
+	    // get supported languages list
+    	Chats.getLanguages()
+		.then(function(languageList) {
+			$scope.list = languageList;	// array of objects { language: zh-CN, name: Chinese }
+		});
+	  };
+	  $scope.closeModal = function() {
+	    $scope.modal.hide();
+	  };
+	  //Cleanup the modal when we're done with it!
+	  $scope.$on('$destroy', function() {
+	    $scope.modal.remove();
+	  });
+	  // Execute action on hide modal
+	  $scope.$on('modal.hidden', function() {
+	    // Execute action
+	  });
+	  // Execute action on remove modal
+	  $scope.$on('modal.removed', function() {
+	    // Execute action
+	  });
 
 })
 
-.controller('AccountCtrl', function($scope) {
+.controller('LanguageCtrl', function($scope, $ionicSideMenuDelegate) {
+	$scope.toggleLeft = function() {
+		$ionicSideMenuDelegate.toggleLeft();
+    };
+})
+
+.controller('AccountCtrl', function($scope, $ionicModal, Chats) {
+	$scope.loggedInUser = "John";
+
 	$scope.settings = {
 		enableFriends: true
 	};
+
+	$ionicModal.fromTemplateUrl('templates/language-select.html', {
+	    scope: $scope,
+	    animation: 'slide-in-up'
+	  }).then(function(modal) {
+	    $scope.modal = modal;
+	  });
+
+	  $scope.openModal = function() {
+	  	console.log("open modal");
+	    $scope.modal.show();
+	    console.log("open modal");
+	    // get supported languages list
+    	Chats.getLanguages()
+		.then(function(languageList) {
+			console.log("got language list");
+			$scope.list = languageList;	// array of objects { language: zh-CN, name: Chinese }
+		});
+	  };
+
+	  $scope.closeModal = function() {
+	    $scope.modal.hide();
+	  };
+
+	  // set source language
+	  $scope.setLanguage = function(languageCode) {
+		console.log("set language called");
+		console.log("logged in user", $scope.loggedInUser);
+		$scope.sourceLanguage = languageCode;// selected language from select
+		console.log("$scope sourceLanguage", $scope.sourceLanguage);
+		Chats.setSourceLanguage($scope.loggedInUser, languageCode)
+		.then(function() {
+			console.log("source language updated");
+			$scope.closeModal();
+		}).catch(function(err) {
+			console.log(err);
+		})
+		
+    };
+
 });

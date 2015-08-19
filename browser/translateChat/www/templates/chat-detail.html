@@ -4,34 +4,62 @@
   The FriendsCtrl pulls data from the Friends service (service.js)
   The Friends service returns an array of friend data
 -->
+
+
 <ion-view view-title="{{chat.name}}">
-  <ion-content class="padding">
-    <img ng-src="{{chat.face}}" style="width: 64px; height: 64px">
-<!--     <p ng-repeat="message in messages">
-      {{ message.translated }}
-    </p>
-    <p ng-repeat="">
 
-    </p> -->
+  <ion-nav-buttons side="secondary">
+      <button class="button" ng-click="openModal()">
+        Edit Target Language
+      </button>
+  </ion-nav-buttons>
 
-<!--     live Translate view -->
+
+  <ion-content overflow-scroll="true" class="padding">
+    <ion-list>
+      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="message in messages" type="item-text-wrap" style="padding-left: 10px">
+<!--         <h2>{{ message.from }}</h2> -->
+      <div class="row">
+        <div class="col-25">
+          <h2>{{ message.from }}: </h2>
+        </div>
+        <div class="col-75" style="margin-left: 2px;">
+          </p>{{ message.translated }}</p>
+          <p>( {{ message.content }} )</p>
+        </div>
+      </div>
+    <!--     <p>{{ message.content }}</p> -->
+
+      </ion-item>
+    </ion-list>
+  <!--     live Translate view -->
     <label class="item item-input">
     <input type="text" placeholder="Live Translate" ng-readonly="true" ng-model="liveTranslateView">
-  </label>
+    </label>
 <!--     live Translate view -->
+
+    <ion-infinite-scroll
+      ng-if="moreDataCanBeLoaded()"
+      icon="ion-loading-c"
+      on-infinite="loadMoreData()"
+      distance="1%">
+    </ion-infinite-scroll>
   </ion-content>
 
+
   <ion-footer-bar class="bar-stable">
+    <form ng-submit="submitMessage()" style="width: 100%;">
       <div class="item item-input-inset" style="width: 100%;">
         <label class="item-input-wrapper">
           <!--     input field -->
-          <input type="text" placeholder="Message" ng-model="input">
+          <input style="width: 100%;" type="text" placeholder="Message" ng-model="input">
           <!--     input field -->
         </label>
-        <button class="button button-small">
+        <button type="submit" class="button button-small">
           Send
         </button>
       </div>
+    </form>
   </ion-footer-bar>
 </ion-view>
   <!--     <div class="bar bar-footer">

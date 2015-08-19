@@ -1,0 +1,21 @@
+{
+  "name": "translate-chat",
+  "version": "0.0.0",
+  "homepage": "https://github.com/cl2205/translate-chat",
+  "authors": [
+    "Catherine Lau <clau.catherine@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angularfire": "~1.1.1",
+    "firebase": "~2.2.6",
+    "fireproof": "~2.5.2"
+  }
+}
