@@ -17,13 +17,13 @@ Features
 
  ![full-convo](screenshots/7-full-convo.png "Full Text Exchange")
 
-- Users can set individual target languages for each person with whom they chat (ie. setting texts for one friend to be translated in Spanish)
+- Can set their preferred 'receiving' language along with individual target languages for each person with whom they chat (ie. setting texts for one friend to be translated in Spanish). 
 
  ![language-menu](screenshots/3-language-menu.png "Language Menu")
 
+- Quick search language filter
  ![language-quick-search](screenshots/4-select-language.png "Language Quick Search")
 
-- Users can also set their desired source language for receiving texts (ie. receiving texts in Chinese)
 
 - A 'Chats' tab contains chat list with all contacts, with preview of the most recent text for each chat
 
