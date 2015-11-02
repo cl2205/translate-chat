@@ -1,11 +1,13 @@
 {
   "name": "FullstackGeneratedApp",
   "version": "1.0.0",
+  "engines": {
+    "node": "4.0.0"
+  },
   "description": "A chat app that translates messages in real-time",
   "main": "server/start.js",
   "scripts": {
-    "start": "nodemon --watch server -e js,html server/start.js",
-    "postinstall": "gulp build"
+    "start": "nodemon --watch server -e js,html server/start.js"
   },
   "dependencies": {
     "babel": "^5.0.12",
