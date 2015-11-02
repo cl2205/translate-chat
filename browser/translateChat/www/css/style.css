@@ -1,1 +1,6 @@
 /* Empty. Add your own CSS if you like */
+
+
+ion-footer-bar {
+	height: 55px !important;
+}

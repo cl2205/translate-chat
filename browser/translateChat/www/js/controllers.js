@@ -29,6 +29,7 @@ angular.module('translate.controllers', [])
 
 	$scope.loggedInUser = "John";
 	$scope.targetLanguage;
+	$scope.sourceLanguage = "en";
 
 	$scope.$watchCollection('chats', function(newChats, oldChats) {
 

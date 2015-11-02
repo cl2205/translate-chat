@@ -56,8 +56,10 @@ router.post('/', function(req, res, next) {
  	usersRef.then(function(usersRef_snap) {	// find users that match phone #s
  		var users = usersRef_snap.val();
  		var sender = _.findKey(users, { 'phoneNumber' : +req.body.From }) // convert to # with +
+ 		
  		// if sender is undefined, create a new user, and create a new chat with the recipient and sender
  		var recipient = _.findKey(users, { 'phoneNumber' : +req.body.To } )
+
  		message.from = sender;
  		message.to = recipient;
  		recipientLanguage = users[recipient].source_language;
