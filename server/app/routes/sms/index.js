@@ -34,7 +34,7 @@ function translate(msg, targetLang) {
         .then(function(body) {
             body = JSON.parse(body);
             var translatedMsg = body.data.translations[0].translatedText;
-            // console.log("translatedMsg", translatedMsg);
+  
             return translatedMsg;
         })
         .catch(function(err) {
@@ -44,7 +44,6 @@ function translate(msg, targetLang) {
 
 
 router.post('/', function(req, res, next) {
-	console.log("hit post route");
 
  	var ref = new Firebase("https://fiery-torch-3361.firebaseio.com");
 
