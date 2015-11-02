@@ -2,10 +2,26 @@ Translate Chat is a prototype of a hybrid mobile messaging app whose goal is hel
 
 Features
 
-- Users can set their desired source language for receiving texts (ie. receiving texts in Chinese)
-- Users can also set individual target languages for each person with whom they chat (ie. setting texts for one friend to be translated in Spanish)
-- Chat view includes a live preview that shows texts being translated as the user types
+- Chat view includes a live translation preview that shows texts being translated as the user types
+
+ ![live-translate](screenshots/5-live-translate.png "Live Translate Preview")
+
 - Chat view displays both the original text input by the sender and the translated text for easy comprehension
+
+ ![full-convo](screenshots/7-full-convo.png "Full Text Exchange")
+
+- Users can set individual target languages for each person with whom they chat (ie. setting texts for one friend to be translated in Spanish)
+
+ ![language-menu](screenshots/3-language-menu.png "Language Menu")
+
+ ![language-quick-search](screenshots/4-select-language.png "Language Quick Search")
+
+- Users can also set their desired source language for receiving texts (ie. receiving texts in Chinese)
+
+- A 'Chats' tab contains chat list with all contacts, with preview of the most recent text for each chat
+
+ ![chat-list](screenshots/1-chat-list.png "Chat List")
+
 
 Technologies
 
