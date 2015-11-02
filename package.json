@@ -7,6 +7,7 @@
   "description": "A chat app that translates messages in real-time",
   "main": "server/start.js",
   "scripts": {
+    "build": "gulp",
     "start": "nodemon --watch server -e js,html server/start.js"
   },
   "dependencies": {

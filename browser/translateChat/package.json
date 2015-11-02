@@ -2,6 +2,7 @@
   "name": "translatechat",
   "version": "1.0.0",
   "description": "translateChat: An Ionic project",
+  "build": "gulp",
   "dependencies": {
     "gulp": "^3.5.6",
     "gulp-sass": "^1.3.3",
