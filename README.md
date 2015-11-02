@@ -1,8 +1,15 @@
 Translate Chat is a prototype of a hybrid mobile messaging app whose goal is help users overcome language barriers by translating texts as they chat in real time, catered to each recipient’s language needs. Translate Chat was created as a personal hackathon project at Fullstack Academy in NYC.
 
+Technologies
+
+- Integrates Ionic framework, Twilio, and Node/Express server to programmatically send and receive translated text messages
+- Uses Firebase for real-time data storage/syncing  and Google Translate API to support translations between 90 languages
+
 Features
 
 - Chat view includes a live translation preview that shows texts being translated as the user types
+
+ ![chat-view](screenshots/2-indiv-chat.png "Chat View")
 
  ![live-translate](screenshots/5-live-translate.png "Live Translate Preview")
 
@@ -22,8 +29,3 @@ Features
 
  ![chat-list](screenshots/1-chat-list.png "Chat List")
 
-
-Technologies
-
-- Integrates Ionic framework, Twilio, and Node/Express server to programmatically send and receive translated text messages
-- Uses Firebase for real-time data storage/syncing  and Google Translate API to support translations between 90 languages
