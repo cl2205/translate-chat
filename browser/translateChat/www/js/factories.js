@@ -5,8 +5,8 @@ angular.module('translate.factories', [])
 	// seed users and chats
 	var users = {
 
-	    "John": { source_language: "en", contacts: { Obama: true, Fullstack: true, Kelly: true }, chats: [ "chat1", "chat2", "chat3" ], phoneNumber: +16467831204 },
-	    "Kelly": { source_language: "zh-TW", contacts: { John: true, Obama: true, Fullstack: true }, chats: { chat1: true }, phoneNumber: +13236329813 },
+	    "John": { source_language: "en", contacts: { Obama: true, Fullstack: true, Kelly: true }, chats: [ "chat1", "chat2", "chat3" ], phoneNumber: +9172542078 },
+	    "Kelly": { source_language: "zh-TW", contacts: { John: true, Obama: true, Fullstack: true }, chats: { chat1: true }, phoneNumber: +9172542078 },
 	    "Obama": { source_language: "en", contacts: { John: true, Fullstack: true, Kelly: true }, chats: { chat2: true, chat4: true }, phoneNumber: +19172542078 },
 	    "Fullstack": { source_language: "fr", contacts: { John: true, Obama: true, Kelly: true }, chats: { chat3: true, chat4: true }, phoneNumber: +19172542078 }
 	};
