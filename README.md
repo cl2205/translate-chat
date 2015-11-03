@@ -22,10 +22,10 @@ Features
  ![language-menu](screenshots/3-language-menu.png "Language Menu")
 
 - Quick search language filter
- ![language-quick-search](screenshots/4-select-language.png "Language Quick Search")
 
+![language-quick-search](screenshots/4-select-language.png "Language Quick Search")
 
 - A 'Chats' tab contains chat list with all contacts, with preview of the most recent text for each chat
 
- ![chat-list](screenshots/1-chat-list.png "Chat List")
+ ![chat-list](screenshots/7-persist-text.png "Chat List")
 
