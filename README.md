@@ -27,5 +27,5 @@ Features
 
 - A 'Chats' tab contains chat list with all contacts, with preview of the most recent text for each chat
 
- ![chat-list](screenshots/7-persist-text.png "Chat List")
+ ![chat-list](screenshots/8-persist-text.png "Chat List")
 
