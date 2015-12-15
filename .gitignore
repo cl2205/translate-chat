@@ -4,4 +4,8 @@ npm-debug.log
 public
 .DS_Store
 bower_components
+Procfile
 server/env/development.js
+.*
+*.log
+temp_logs.txt
