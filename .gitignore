@@ -7,5 +7,5 @@ bower_components
 Procfile
 server/env/development.js
 .*
-*.log
+**/*.log
 temp_logs.txt
